@@ -1,2 +1,11 @@
-%Recomendaciones
-Indicar las recomendaciones formuladas a partir del desarrollo de este trabajo de integración curricular.
+Basado en la experiencia adquirida durante el desarrollo de este proyecto y los resultados obtenidos, se formulan las siguientes recomendaciones para trabajos futuros y la evolución de la herramienta:
+
+\begin{itemize}
+    \item \textbf{Expansión de la Gramática SQL:} Se recomienda ampliar el motor de traducción para soportar características más avanzadas del lenguaje SQL, tales como subconsultas anidadas, funciones de agregación (\texttt{GROUP BY}, \texttt{HAVING}) y operaciones de modificación de datos (\texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}). Esto permitiría una gestión completa del ciclo de vida de los datos desde la interfaz del \textit{middleware}.
+
+    \item \textbf{Visualización Gráfica de Resultados:} Aunque la visualización en formato JSON y tabular es funcional, se sugiere integrar una librería de visualización de grafos (como D3.js o Vis.js) en el \textit{frontend}. Esto permitiría a los usuarios ver los nodos y relaciones de manera gráfica e interactiva, aprovechando al máximo la naturaleza visual de las bases de datos orientadas a grafos.
+
+    \item \textbf{Soporte Multilenguaje y Multibase:} Para aumentar la versatilidad de la herramienta, sería beneficioso investigar la implementación de adaptadores para otros lenguajes de consulta de grafos, como Gremlin, y otras bases de datos más allá de Neo4j, como Amazon Neptune o JanusGraph.
+
+    \item \textbf{Optimización de Rendimiento:} Se aconseja realizar pruebas de estrés con volúmenes masivos de datos para identificar posibles cuellos de botella en el proceso de traducción y renderizado de resultados. Implementar mecanismos de paginación en el servidor y carga diferida (\textit{lazy loading}) en el cliente mejoraría la respuesta del sistema ante consultas que retornan miles de nodos.
+\end{itemize}

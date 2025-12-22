@@ -1,17 +1,182 @@
 En esta fase se detalla todo el desarrollo del \textit{middleware} para traducir sentencias SQL a sentencias GQL y ejecutarlas en una base de datos orientada a grafos utilizando el marco de trabajo Scrum. Esta sección incluye todas las actividades desarrolladas y el incremento entregado al final de cada sprint.
 
-\subsection{Sprint 0}
-\subsubsection{Sprint 0 Planning}
+\subsection{Sprint 1}
+\subsubsection{Sprint 1 Planning}
+El objetivo principal del Sprint 1 fue implementar la funcionalidad principal del \textit{middleware}: la traducción básica de sentencias SQL a Cypher. Durante la planificación, se seleccionó la historia de usuario relacionada con el análisis sintáctico y la creación de la interfaz principal de traducción, priorizando la capacidad de procesar consultas simples antes de abordar estructuras más complejas.
+
+\subsubsection{Sprint 1 Backlog}
+La Tabla \ref{tab:sprintBacklog1} detalla las tareas del Sprint 1.
+
+\input{../03Tables/02Chapter/C2.tableSprintBacklog1}
 
 
-\subsubsection{Sprint 0 Backlog}
+\subsubsection{Ejecución del Sprint 1}
+La ejecución de este sprint se centró en el desarrollo del motor de traducción. Se implementó la lógica de parseo (T1.1) necesaria para identificar los componentes de una sentencia SQL básica (SELECT, FROM, WHERE) y mapearlos a sus equivalentes en Cypher (MATCH, RETURN, WHERE).
+
+Simultáneamente, se desarrolló el endpoint en el backend (T1.2) que expone esta lógica de traducción. Se definió la ruta \texttt{POST /api/translate}, la cual recibe en el cuerpo de la petición un objeto JSON con la sentencia SQL y retorna la sentencia Cypher generada. En el frontend, se construyó la vista de traducción (T1.4), integrando el diseño aprobado en el Sprint 0. Esta interfaz consume el servicio mencionado, permitiendo al usuario ingresar código SQL y visualizar la traducción resultante en tiempo real.
+
+\paragraph{Pruebas con Postman}
+Para validar la funcionalidad del endpoint de traducción, se realizaron pruebas exhaustivas utilizando Postman. Se configuraron casos de prueba para verificar:
+\begin{itemize}
+    \item \textbf{Traducción exitosa:} Envío de sentencias \texttt{SELECT} simples y verificación de que el código de estado HTTP sea 200 OK y el cuerpo de la respuesta contenga el Cypher esperado.
+    \item \textbf{Manejo de errores:} Envío de cuerpos de petición vacíos o con formato JSON inválido para asegurar que la API responda con códigos 400 Bad Request y mensajes de error descriptivos.
+\end{itemize}
+
+% Se sugiere agregar aquí una captura de Postman mostrando una petición al endpoint /api/translate y su respuesta.
+
+\subsubsection{Sprint 1 Review}
+En la revisión del sprint, se demostró la funcionalidad de traducción con sentencias SQL simples. Se verificó que el sistema recibiera una consulta SQL válida, la procesara correctamente en el backend y devolviera la sentencia Cypher correspondiente en la interfaz de usuario. Los interesados validaron que la sintaxis generada fuera correcta para una base de datos Neo4j estándar.
+
+\subsubsection{Sprint 1 Retrospective}
+\begin{itemize}
+    \item \textbf{¿Qué salió bien?} \newline
+    La integración entre el frontend y el backend fue fluida gracias a la definición clara de los contratos de la API. El uso de bibliotecas de parseo facilitó la identificación de tokens SQL.
+    \item \textbf{¿Qué se puede mejorar?} \newline
+    Se subestimó la complejidad de manejar ciertas variaciones sintácticas de SQL. Para el próximo sprint, se acordó realizar un análisis más detallado de los casos borde antes de comenzar la implementación.
+\end{itemize}
 
 
-\subsubsection{Ejecución del Sprint 0}
+\subsection{Sprint 2}
+\subsubsection{Sprint 2 Planning}
+El Sprint 2 tuvo como meta extender la capacidad de traducción para soportar consultas relacionales complejas, específicamente aquellas que involucran uniones de tablas (JOINs). La planificación se enfocó en cómo interpretar las claves foráneas del modelo relacional y transformarlas en relaciones semánticas dentro del modelo de grafos.
+
+\subsubsection{Sprint 2 Backlog}
+La Tabla \ref{tab:sprintBacklog2} detalla las tareas del Sprint 2.
+
+\input{../03Tables/02Chapter/C2.tableSprintBacklog2}
 
 
-\subsubsection{Sprint 0 Review}
+\subsubsection{Ejecución del Sprint 2}
+Durante este periodo, el trabajo técnico fue de alta complejidad lógica. Se desarrolló el algoritmo para la detección de cláusulas JOIN y claves foráneas dentro de las sentencias SQL (T2.1). Este componente es crucial para entender cómo se relacionan las entidades en el esquema original.
+
+Posteriormente, se actualizó el endpoint de traducción (\texttt{POST /api/translate}) para soportar estas nuevas estructuras. Se implementó el mapeo de claves foráneas a relaciones de grafos en Cypher (T2.2), traduciendo la estructura \texttt{TABLA\_A JOIN TABLA\_B ON A.id = B.a\_id} a un patrón de grafo \texttt{(a:TablaA)-[:RELACION]->(b:TablaB)}. Finalmente, se ajustó la visualización en el frontend (T2.3) para manejar y presentar adecuadamente estas consultas más extensas y complejas.
+
+\paragraph{Pruebas con Postman}
+Las pruebas de integración se enfocaron en validar la capacidad del endpoint para procesar relaciones:
+\begin{itemize}
+    \item \textbf{Joins Implicitos y Explícitos:} Se enviaron peticiones con sentencias SQL conteniendo \texttt{INNER JOIN} y \texttt{LEFT JOIN}. Se verificó en la respuesta JSON que la cadena Cypher resultante incluyera la sintaxis de relaciones (flechas y etiquetas) correcta.
+    \item \textbf{Validación de Sintaxis:} Se probaron casos con sintaxis de JOIN incompleta para confirmar que el parser devolviera los errores de sintaxis adecuados antes de intentar la traducción.
+\end{itemize}
+
+% Se sugiere agregar aquí una tabla comparativa o imagen mostrando una sentencia SQL con JOIN y su traducción a Cypher.
+
+\subsubsection{Sprint 2 Review}
+La revisión consistió en probar el sistema con consultas SQL que incluían `INNER JOIN` y `LEFT JOIN`. Se demostró cómo el \textit{middleware} identificaba correctamente las tablas involucradas y generaba la relación explícita en Cypher. La precisión en la traducción de las relaciones fue el criterio de aceptación principal validado.
+
+\subsubsection{Sprint 2 Retrospective}
+\begin{itemize}
+    \item \textbf{¿Qué salió bien?} \newline
+    El algoritmo de detección de relaciones demostró ser robusto para los casos de uso estándar. La visualización de las consultas complejas se mantuvo limpia y legible.
+    \item \textbf{¿Qué se puede mejorar?} \newline
+    La lógica para nombrar las relaciones en el grafo generó debates sobre la mejor convención a seguir. Se decidió estandarizar una nomenclatura para las relaciones generadas automáticamente para evitar ambigüedades en el futuro.
+\end{itemize}
 
 
+\subsection{Sprint 3}
+\subsubsection{Sprint 3 Planning}
+El Sprint 3 se dedicó a mejorar la robustez del sistema mediante la gestión de errores y a establecer la conectividad real con la base de datos de destino. El objetivo fue permitir que la aplicación no solo tradujera, sino que también se comunicara con una instancia de Neo4j y manejara adecuadamente las excepciones.
 
-\subsubsection{Sprint 0 Retrospective}
+\subsubsection{Sprint 3 Backlog}
+La Tabla \ref{tab:sprintBacklog3} detalla las tareas del Sprint 3.
+
+\input{../03Tables/02Chapter/C2.tableSprintBacklog3}
+
+
+\subsubsection{Ejecución del Sprint 3}
+En este sprint se desarrollaron dos frentes importantes. Por un lado, se implementó el módulo de gestión de errores. Se creó el componente visual para alertas (T3.2) y se programó la lógica para ofrecer detalles específicos sobre errores de sintaxis o traducción, incluyendo sugerencias de corrección para el usuario (T3.3).
+
+Por otro lado, se abordó la conectividad. Se desarrolló el endpoint \texttt{POST /api/connection/test} (T4.1), diseñado para validar las credenciales de acceso a una base de datos Neo4j externa. Este servicio recibe la URI, usuario y contraseña, intenta establecer una sesión con el driver oficial y retorna el estado de la conexión. En el frontend, se integró este servicio en el formulario de conexión (T4.4), permitiendo al usuario recibir feedback inmediato sobre el estado de su conexión.
+
+\paragraph{Pruebas con Postman}
+Se realizaron pruebas específicas para el nuevo endpoint de conectividad:
+\begin{itemize}
+    \item \textbf{Conexión Exitosa:} Se enviaron credenciales válidas de una instancia activa de Neo4j, verificando una respuesta 200 OK y un mensaje de confirmación.
+    \item \textbf{Fallos de Autenticación:} Se probaron credenciales incorrectas para asegurar que el sistema capturara la excepción del driver y devolviera un código 401 Unauthorized con un mensaje claro para el usuario.
+    \item \textbf{Errores de Red:} Se simularon escenarios con URIs inalcanzables para validar el manejo de tiempos de espera (timeouts).
+\end{itemize}
+
+% Se sugiere agregar aquí una captura de pantalla del formulario de conexión o de un mensaje de error con sugerencia.
+
+\subsubsection{Sprint 3 Review}
+La demostración incluyó dos escenarios: uno fallido, donde se introdujo sintaxis SQL inválida para mostrar las nuevas alertas y sugerencias de corrección; y uno exitoso, donde se configuró la conexión a una instancia local de Neo4j, verificando que el sistema pudiera autenticarse correctamente.
+
+\subsubsection{Sprint 3 Retrospective}
+\begin{itemize}
+    \item \textbf{¿Qué salió bien?} \newline
+    La implementación de sugerencias de corrección aportó un gran valor a la usabilidad del sistema. El uso del driver oficial de Neo4j simplificó la gestión de la conexión.
+    \item \textbf{¿Qué se puede mejorar?} \newline
+    La gestión de estados de conexión en el frontend resultó más compleja de lo anticipado, requiriendo refactorización para asegurar que la sesión se mantuviera activa o se cerrara adecuadamente según la interacción del usuario.
+\end{itemize}
+
+
+\subsection{Sprint 4}
+\subsubsection{Sprint 4 Planning}
+Con la traducción y la conexión resueltas, el Sprint 4 se enfocó en cerrar el ciclo funcional: ejecutar las consultas traducidas y gestionar el historial de uso. El objetivo fue permitir al usuario ver los resultados reales de sus consultas en la base de datos de grafos y acceder a sus operaciones previas.
+
+\subsubsection{Sprint 4 Backlog}
+La Tabla \ref{tab:sprintBacklog4} detalla las tareas del Sprint 4.
+
+\input{../03Tables/02Chapter/C2.tableSprintBacklog4}
+
+
+\subsubsection{Ejecución del Sprint 4}
+Este sprint fue intensivo en integración. Se implementó el endpoint \texttt{POST /api/execute} (T5.2), el cual orquesta la ejecución de las consultas. Este servicio recibe la sentencia Cypher traducida y los parámetros de conexión, envía la instrucción a la base de datos Neo4j y procesa los registros retornados para devolverlos en una estructura JSON estandarizada.
+
+Para visualizar estos datos, se desarrolló un área de resultados versátil que permite alternar entre una vista tabular y una vista en formato JSON (T5.4), facilitando la inspección de la respuesta. Adicionalmente, se construyó el módulo de historial. Se implementó el almacenamiento local de las consultas ejecutadas (T6.1) y se desarrolló la vista del historial (T6.4). Una funcionalidad clave añadida fue la capacidad de reactivar una consulta antigua: al seleccionarla del historial, los cuadros de texto de traducción se rellenan automáticamente con la información guardada (T6.2), agilizando el flujo de trabajo del usuario.
+
+\paragraph{Pruebas con Postman}
+Las pruebas se centraron en la ejecución real de consultas contra la base de datos:
+\begin{itemize}
+    \item \textbf{Ejecución de Consultas de Lectura:} Se enviaron sentencias \texttt{MATCH} válidas a través del endpoint de ejecución, verificando que la respuesta contuviera la estructura de nodos y relaciones esperada en formato JSON.
+    \item \textbf{Manejo de Respuestas Vacías:} Se validó el comportamiento del endpoint cuando la consulta no retorna resultados, asegurando que se devuelva una lista vacía y no un error.
+    \item \textbf{Integridad de Datos:} Se compararon los resultados obtenidos en Postman con los datos visualizados directamente en Neo4j Browser para garantizar la fidelidad de la información.
+\end{itemize}
+
+% Se sugiere agregar aquí una imagen del área de resultados mostrando datos en formato JSON o tabla.
+
+\subsubsection{Sprint 4 Review}
+En la revisión se ejecutó un flujo completo: ingresar SQL, traducir, conectar a la BD, ejecutar la traducción y visualizar los nodos retornados. También se navegó por el historial, recuperando consultas de sesiones anteriores. La funcionalidad de ejecución real fue el hito más celebrado por los interesados.
+
+\subsubsection{Sprint 4 Retrospective}
+\begin{itemize}
+    \item \textbf{¿Qué salió bien?} \newline
+    La visualización dual (Tabla/JSON) fue muy bien recibida. El mecanismo de persistencia del historial funcionó correctamente sin afectar el rendimiento.
+    \item \textbf{¿Qué se puede mejorar?} \newline
+    El volumen de tareas en este sprint fue alto. Aunque se completaron, la carga de trabajo fue considerable. Se aprendió la importancia de no sobrecargar los sprints finales con funcionalidades críticas de integración.
+\end{itemize}
+
+
+\subsection{Sprint 5}
+\subsubsection{Sprint 5 Planning}
+El último sprint, el Sprint 5, se destinó a funcionalidades de valor añadido y cierre del desarrollo. El objetivo principal fue dotar al sistema de capacidades de exportación de datos, permitiendo a los usuarios extraer la información obtenida para su uso en otras herramientas.
+
+\subsubsection{Sprint 5 Backlog}
+La Tabla \ref{tab:sprintBacklog5} detalla las tareas del Sprint 5.
+
+\input{../03Tables/02Chapter/C2.tableSprintBacklog5}
+
+
+\subsubsection{Ejecución del Sprint 5}
+Las tareas de este sprint se centraron en la manipulación de datos para exportación. Se desarrolló un servicio de transformación capaz de convertir la estructura jerárquica del JSON (resultado de Neo4j) a un formato plano CSV (T7.1). Aunque esta lógica se ejecuta principalmente del lado del cliente para optimizar el rendimiento, se implementaron validaciones para asegurar la integridad de los datos antes de la conversión.
+
+Complementando esto, se implementó la función de descarga en el frontend (T7.2), integrando un botón que desencadena la conversión y genera el archivo descargable para el usuario. Además, se aprovechó este sprint para realizar pruebas finales de integración y pulir detalles estéticos de la interfaz antes de la entrega final.
+
+\paragraph{Pruebas de Integración}
+Dado que la exportación depende de la correcta estructura de los datos recibidos, se realizaron pruebas de flujo completo:
+\begin{itemize}
+    \item \textbf{Validación de Estructura JSON:} Se utilizó Postman para verificar que el endpoint de ejecución (\texttt{/api/execute}) retornara siempre un JSON válido y bien formado, requisito indispensable para el parser de CSV.
+    \item \textbf{Pruebas de Descarga:} Se verificó manualmente que los archivos generados pudieran abrirse correctamente en software de hojas de cálculo y que los caracteres especiales (tildes, ñ) se codificaran correctamente.
+\end{itemize}
+
+% Se sugiere agregar aquí un fragmento de código de la función de conversión JSON a CSV.
+
+\subsubsection{Sprint 5 Review}
+La revisión final sirvió para presentar el producto completo. Se demostró la nueva funcionalidad de exportación descargando los resultados de una consulta compleja y abriéndolos en una hoja de cálculo externa. El sistema fue validado en su totalidad, cumpliendo con los requisitos de traducción, ejecución y gestión de datos definidos al inicio del proyecto.
+
+\subsubsection{Sprint 5 Retrospective}
+\begin{itemize}
+    \item \textbf{¿Qué salió bien?} \newline
+    El sprint fue menos cargado, lo que permitió dedicar tiempo a la estabilización del código y corrección de pequeños bugs visuales. La funcionalidad de exportación funcionó a la primera gracias a las pruebas unitarias previas.
+    \item \textbf{¿Qué se puede mejorar?} \newline
+    Mirando hacia atrás en todo el proyecto, se podría haber integrado la funcionalidad de exportación antes, ya que resultó ser muy útil para las pruebas de los propios desarrolladores.
+\end{itemize}

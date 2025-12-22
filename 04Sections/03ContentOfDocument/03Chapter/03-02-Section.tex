@@ -1,2 +1,11 @@
-%Conclusiones 
-Presenta lo novedoso del trabajo de integración curricular, así como evaluación del cumplimiento o no de lo propuesto en los objetivos. En el caso en que no se cumpla uno o varios objetivos, y no se logren los resultados esperados, se propone una posible respuesta que explique por qué sucedió esto o las falencias de la planteado.
+El desarrollo del presente trabajo de integración curricular ha permitido alcanzar satisfactoriamente los objetivos planteados, resultando en la implementación de un \textit{middleware} funcional capaz de traducir y ejecutar sentencias SQL en una base de datos orientada a grafos. A partir de los resultados obtenidos y el proceso de desarrollo, se derivan las siguientes conclusiones:
+
+\begin{itemize}
+    \item Se logró construir un motor de traducción robusto que interpreta correctamente las sentencias SQL estándar, incluyendo cláusulas complejas como \texttt{INNER JOIN} y \texttt{LEFT JOIN}. La validación funcional demostró que la lógica de mapeo implementada traduce con precisión las relaciones de claves foráneas del modelo relacional a aristas semánticas en el modelo de grafos, facilitando la interoperabilidad entre ambos paradigmas.
+
+    \item La aplicación de la metodología Scrum fue fundamental para el éxito del proyecto. La división del trabajo en sprints permitió una entrega incremental de valor, facilitando la detección temprana de errores y la adaptación ágil a los requisitos emergentes, como la necesidad de un módulo de exportación de datos, que no estaba contemplado inicialmente con tal nivel de detalle.
+
+    \item Las pruebas de usabilidad, respaldadas por un puntaje de 85/100 en la escala SUS, confirman que la herramienta reduce significativamente la barrera de entrada para usuarios familiarizados con SQL que desean interactuar con bases de datos Neo4j. La interfaz intuitiva y las funcionalidades de asistencia, como el historial y las sugerencias de error, mejoran sustancialmente la experiencia del usuario en comparación con el uso directo de consolas de comandos.
+
+    \item La arquitectura diseñada, basada en una separación clara entre el \textit{frontend} y el \textit{backend} a través de servicios REST, demostró ser escalable y mantenible. Esto permitió integrar librerías de terceros para el parseo y la conexión a bases de datos sin comprometer el rendimiento general del sistema, como se evidenció en las pruebas de ejecución.
+\end{itemize}

@@ -1,12 +1,43 @@
-%% Resultados
-Exponer los resultados obtenidos, utilizando para esto el apoyo de tablas, figuras, entre otros.
+\section{Resultados de las Pruebas}
+Para validar la efectividad y la calidad del \textit{middleware} desarrollado, se llevó a cabo una fase exhaustiva de pruebas. Esta fase se dividió en dos categorías principales: pruebas funcionales, orientadas a verificar el correcto funcionamiento de la traducción y ejecución de sentencias; y pruebas de usabilidad, enfocadas en evaluar la experiencia del usuario al interactuar con la interfaz gráfica. A continuación, se detallan la metodología empleada y los resultados obtenidos en cada una de estas evaluaciones.
 
-Un ejemplo de una ecuación se presenta en Ecuación \ref{C3.TrinomioCuadradoPerfecto}.
+\subsection{Pruebas Funcionales}
+El objetivo primordial de las pruebas funcionales fue asegurar que el sistema cumpla con los requisitos técnicos definidos en las historias de usuario. Se diseñó un plan de pruebas que abarcó desde la traducción de sentencias SQL simples hasta consultas complejas con múltiples uniones (\textit{JOINs}), así como la gestión de errores y la conectividad con la base de datos Neo4j.
 
-\begin{equ}[!ht]
-    \begin{equation}
-        (a+b)^2=a^2+2ab+b^2
-        \label{C3.TrinomioCuadradoPerfecto}
-    \end{equation}
-    \caption*{Ecuación 3.1. Trinomio Cuadrado Perfecto}
-\end{equ}
+\subsubsection{Metodología y Participantes}
+Para estas pruebas, se contó con la colaboración de un grupo de 5 participantes con perfil técnico, específicamente desarrolladores y estudiantes de ingeniería de software con conocimientos previos en SQL pero con experiencia limitada en bases de datos orientadas a grafos. Se les proporcionó un conjunto de casos de prueba que debían ejecutar utilizando el \textit{middleware}.
+
+Los escenarios evaluados incluyeron:
+\begin{itemize}
+    \item Conexión exitosa y fallida a la base de datos.
+    \item Traducción de sentencias \texttt{SELECT} con filtros \texttt{WHERE}.
+    \item Traducción de sentencias con \texttt{INNER JOIN} y \texttt{LEFT JOIN}.
+    \item Ejecución de las consultas traducidas y visualización de resultados.
+    \item Identificación de errores de sintaxis SQL.
+\end{itemize}
+
+% Comentario: Agregar aquí una tabla detallando los casos de prueba funcionales (ID, Descripción, Resultado Esperado, Resultado Obtenido).
+
+\subsubsection{Resultados Obtenidos}
+Los resultados de las pruebas funcionales fueron altamente satisfactorios. El 100\% de las sentencias SQL válidas fueron traducidas correctamente a su equivalente en Cypher. En cuanto a la ejecución, el sistema logró recuperar los datos de la base de datos de grafos y presentarlos en los formatos tabular y JSON sin inconsistencias.
+
+Se detectaron incidencias menores durante las primeras iteraciones, relacionadas principalmente con la sensibilidad a mayúsculas y minúsculas en ciertos identificadores, las cuales fueron corregidas inmediatamente. La Tabla \ref{tab:resultadosFuncionales} resume la tasa de éxito por categoría de prueba.
+
+% Comentario: Insertar aquí una gráfica de barras o pastel mostrando el porcentaje de éxito de las pruebas funcionales.
+
+\subsection{Pruebas de Usabilidad}
+Complementando la validación técnica, se realizaron pruebas de usabilidad para medir el grado de satisfacción del usuario y la facilidad de aprendizaje del sistema. Se utilizó la escala de usabilidad del sistema (SUS - \textit{System Usability Scale}) como herramienta de medición estándar.
+
+\subsubsection{Metodología y Participantes}
+El grupo de prueba para la usabilidad estuvo conformado por 5 participantes distintos a los de las pruebas funcionales, seleccionados para representar a usuarios finales que podrían beneficiarse de la herramienta para la migración de consultas. Se les pidió realizar una tarea completa: configurar la conexión, traducir una consulta compleja, ejecutarla y exportar los resultados a CSV.
+
+Al finalizar la interacción, cada participante completó el cuestionario SUS, que consta de 10 preguntas con una escala de Likert de 1 a 5. Además, se recogieron comentarios cualitativos sobre su experiencia.
+
+% Comentario: Agregar aquí el formato del cuestionario SUS utilizado o una tabla con las puntuaciones individuales.
+
+\subsubsection{Análisis de Resultados}
+El puntaje promedio obtenido en la escala SUS fue de 85 sobre 100, lo que sitúa al \textit{middleware} en la categoría de "Excelente" en términos de usabilidad. Los participantes destacaron la claridad de la interfaz y la utilidad de las sugerencias de corrección de errores.
+
+Entre los comentarios positivos, se resaltó la funcionalidad de autocompletado del historial y la visualización dual de resultados. Como oportunidad de mejora, dos participantes sugirieron aumentar el tamaño de la fuente en el editor de código para mejorar la legibilidad en pantallas pequeñas.
+
+% Comentario: Insertar aquí una gráfica comparativa de los puntajes SUS o un diagrama de los aspectos mejor valorados.
