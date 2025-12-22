@@ -1,0 +1,40 @@
+\begin{longtable}{|p{0.5\textwidth}|p{0.5\textwidth}|}
+    \caption{Historia de Usuario 01}
+    \label{tab:hu01} \\
+    
+    \hline
+    \endfirsthead
+    \endhead
+    \multicolumn{2}{r}{\textit{Continúa en la siguiente página...}} \\
+    \endfoot
+    \endlastfoot
+
+    \textbf{ID:} HU01 & \textbf{Usuario:} Desarrollador \\
+    \hline
+    \multicolumn{2}{|l|}{\textbf{Título:} Traducción de consultas básicas} \\
+    \hline
+    \textbf{Prioridad en negocio:} Alta & \textbf{Riesgo en desarrollo:} Alto \\
+    \hline
+    \textbf{Estimación:} 8 & \textbf{Iteración asignada:} 1 \\
+    \hline
+    \multicolumn{2}{|l|}{\textbf{Historia de Usuario:}} \\
+    \hline
+    \multicolumn{2}{|p{1\textwidth}|}{\textbf{Como} desarrollador, \newline \textbf{Quiero} traducir sentencias SELECT, CREATE, UPDATE o DELETE simples a lenguaje Cypher, \newline \textbf{Para} interactuar con bases de datos orientadas a grafos sin tener que aprender un nuevo lenguaje de consulta.} \\
+    \hline
+    \multicolumn{2}{|l|}{\textbf{Criterios de aceptación:}} \\
+    \hline
+    \multicolumn{2}{|p{1\textwidth}|}{\begin{itemize}
+        \item El usuario debe agregar una sentencia SQL válida para ser traducida.
+        \item Las sentencias soporta cláusulas, operadores y funciones básicas.
+        \item Al ingresar una sentencia válida, el sistema devolverá su equivalente en lenguaje Cypher.
+        \item Las consultas traducidas serán agregadas al historial de consultas.
+    \end{itemize}} \\
+    \hline
+    \multicolumn{2}{|l|}{\textbf{Observaciones:}} \\
+    \hline
+    \multicolumn{2}{|p{1\textwidth}|}{\begin{itemize}
+        \item Verificar que la consulta a ser traducida no contenga errores de sintaxis.
+        \item La traducción a Cypher aparecerá junto a la sentencia SQL correspondiente.
+    \end{itemize}} \\
+    \hline
+\end{longtable}

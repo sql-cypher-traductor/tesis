@@ -1,0 +1,172 @@
+\subsection{Antecedentes}
+Dentro de los últimos años, el uso de bases de datos no relacionales en la implementación de sistemas de información ha crecido considerablemente motivo por el cual muchas empresas de desarrollo de software han optado su deseo de migrar las bases de datos SQL en sus soluciones a NoSQL, dado la flexibilidad, escalabilidad y variedad que brinda este tipo de bases de datos hacia sus intereses. Esta necesidad ha conllevado al desarrollo de soluciones que permitan realizar una eficiente traducción entre estos dos tipos de bases de datos.
+Para el presente trabajo, se ha realizado una búsqueda exhaustiva de anteriores trabajos referentes a la traducción de bases de datos relacionales a orientadas a grafos dentro de plataformas digitales como la Biblioteca Digital EPN, SCOPUS y Google Scholar. Se utilizaron varias cadenas de búsqueda como ``SQL a NOSQL'', ``Traducción de SQL a NoSQL'', ``Traducción SQL a grafos'', ``Relacional a grafos'' y ``Relacional a NoSQL'' con lo cual se encontraron algunos trabajos relevantes:
+
+\begin{itemize}
+\item Dai J \cite{dai2019sql}, se centra en la transformación del esquema, la traducción y la optimización de consultas, especialmente en cargas de trabajo OLAP y bases de datos NoSQL orientadas a columnas. En este articulo indica que la desnormalización en NoSQL es clave para evitar costosas operaciones \verb|JOIN| en entornos NoSQL y que técnicas como MapReduce son fundamentales en la traducción de consultas SQL a operaciones NoSQL.
+    \item Namdeo y Suman \cite{namdeo2022middleware}, proponen un middleware para traducción de consultas SQL a NoSQL (SQL-No-QT) el cual actúa como capa intermedia entre aplicaciones heredadas y bases de datos MongoDB.  Este modelo tiene la capacidad de traducir todas las consultas \verb|CRUD| e incluso aquellas que contienen sentencias \verb|JOIN| , de lo que carecía soluciones anteriores como UnityJDBC que se limitaban a traducir consultas \verb|SELECT| sencillas.
+    \item Đukic et al. \cite{djukic2024systematic}, presenta un enfoque sistemático para poder convertir bases de datos relacionales a bases de datos de grafos, enfocándose especialmente en la migración a Neo4J. Esta metodología abarca tres fases: preparación, carga de datos y generación de relaciones, y optimizacion de la base de datos de grafos. A través de este enfoque se obtuvo una mayor eficiencia en el manejo de datos densamente relacionados así como tiempos de ejecución más cortos en comparación con las bases de datos relacionales.
+\end{itemize}
+
+\subsection{Arquitectura de Software}
+La arquitectura de software es la forma de representar cómo se construye un sistema, dividiéndolo en componentes que se comunican entre sí. El propósito de diseñar una arquitectura eficaz es facilitar el entendimiento, desarrollo, despliegue y mantenimiento del producto por parte de los desarrolladores. De acuerdo con Martin \cite{martin2017clean}, una buena arquitectura debe estar centrada en los casos de uso y ser plasmada sobre las funciones del sistema, en lugar de estar dominada por las tecnologías subyacentes.
+
+Para el presente proyecto se definió una arquitectura modular para representar el middleware traductor de consultas SQL a su equivalente en Cypher, el lenguaje con el cual trabaja las bases de  datos de Neo4j. En la Figura \ref{fig:arquitectura}, se puede visualizar la arquitectura adoptada para la realización de este proyecto. Aquí se identifican 4 componentes claves como son: Cliente, Frontend, Backend y las bases de datos, además se indica los protocoles de comunicación respectivos entre los componentes interrelacionados.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{../02Figures/01Chapter/C1.MiddlewareArchitecture.png}
+    \caption{Arquitectura del middleware.}
+    \label{fig:arquitectura}
+\end{figure}
+
+
+\subsection{Metodología de Desarrollo de Software}
+Las metodologías de desarrollo de software son un conjunto de procesos, métodos y herramientas que permiten gestionar cada fase del ciclo de vida del desarrollo de un producto software. Su objetivo principal es organizar y estructurar el trabajo del equipo de desarrollo, garantizando que el proyecto se complete de manera eficiente \cite{pressman2005software}. A continuación se tratará acerca de dos enfoques muy conocidos como son las metodologías tradicionales y Agile.
+
+\subsubsection{Metodologías Tradicionales}
+De acuerdo con Pressman \cite{pressman2005software}, este enfoque se caracteriza por seguir un proceso estricto y lineal, es decir, se requiere completar una fase para avanzar a la siguiente. Estos enfoques suelen aplicarse cuando los requerimientos se encuentran bien definidos y por tanto, los cambios serán mínimos, además de tener una documentación exhaustiva. Su única desventaja radica en la carencia de flexibilidad a los cambios.
+
+\subsubsection{Metodologías Ágiles}
+Por su parte, las metodologías ágiles se basan en un enfoque iterativo e incremental que prioriza la flexibilidad al cambio, el trabajo colaborativo y la entrega continua de valor. Se divide en ciclos cortos de trabajo con el propósito de que al finalizar cada ciclo se pueda entregar una versión funcional del producto. Este enfoque fomenta la participación activa del cliente maximizando su satisfacción mediante la entrega rápida y constante de un producto de alta calidad \cite{stellman2014learning}.
+
+Para cumplir de manera eficiente con los principios y valores de este tipo de metodologías, existen frameworks siendo el más conocido SCRUM, el cual será tratado a continuación.
+
+\subsubsection{Framework SCRUM}
+Es un marco de trabajo que proporciona un conjunto de roles, eventos y artefactos para gestionar y organizar proyectos de desarrollo de software. SCRUM permite una entrega de valor frecuente y una adaptación constante a las necesidades del negocio \cite{schwaber2011scrum}. 
+
+En las Tablas \ref{tab:roles}, \ref{tab:eventos} y \ref{tab:artefactos}, se podrá observar un resumen de los roles, eventos y artefactos proporcionados por este framework.
+
+\input{../03Tables/01Chapter/C1.tableScrumRoles}
+
+\input{../03Tables/01Chapter/C1.tableScrumEvents}
+
+\input{../03Tables/01Chapter/C1.tableScrumArtifacts}
+
+\subsection{Frontend}
+El frontend de una aplicación web es la parte con la que los usuarios interactúan directamente. Su propósito principal es presentar la interfaz de usuario (UI) y añadir interactividad. Las tres lenguajes fundamentales e indispensables para el desarrollo frontend son HTML (Hypertext Markup Language), que define la estructura y la semántica de una página web; CSS (Cascading Style Sheets), que se encarga del diseño y la presentación; y JavaScript, que hace que las páginas web sean interactivas y dinámicas, permitiendo funciones como la clasificación de datos o la validación de formularios en el lado del cliente. En aplicaciones web modernas, como las aplicaciones de una sola página (SPA) implementadas con librerías o frameworks como React, Angular o Vue, gran parte de la lógica de presentación se ejecuta en el cliente, lo que las convierte en "clientes gruesos". Además, el frontend utiliza APIs web, como el DOM API, para manipular elementos HTML, y el Fetch API o Ajax para cargar datos de manera asíncrona desde el servidor, optimizando la experiencia del usuario \cite{ackermann2023full}.
+
+
+\subsubsection{TypeScript}
+Es un lenguaje de programación que contiene la misma sintaxis base de JavaScript razón por la que es conocido como el ``superset de JavaScript''. Es un sistema caracterizado por cuatro elementos clave \cite{goldberg2022learning}:
+\begin{itemize}
+    \item Extiende la sintaxis de JavaScript con características específicas para definir y usar tipos.
+    \item Tiene un verificador de tipos que examina el código para detectar configuraciones incorrectas de variables y funciones.
+    \item Su compilador ejecuta el verificador de tipos, reporta cualquier problema y luego genera el código JavaScript equivalente.
+    \item Dispone de un servicio de lenguaje que ofrece herramientas útiles a los desarrolladores, garantizando la legibilidad y mantenibilidad del código.
+\end{itemize}
+
+Para Goldberg \cite{goldberg2022learning}, la adopción de TypeScript aporta beneficios sustanciales al desarrollo web al mitigar las debilidades de JavaScript, como la falta de seguridad y la documentación imprecisa. Ofrece seguridad al permitirnos especificar explícitamente los tipos de valores para parámetros y variables, lo que ayuda a prevenir errores en tiempo de ejecución que de otro modo podrían causar fallos en JavaScript. Esta restricción controlada sobre el código garantiza que los cambios en una sección no afecten inesperadamente a otras. Además, TypeScript facilita una documentación precisa al integrar la sintaxis para describir la forma de los objetos, creando un sistema de tipado robusto y obligatorio. Las herramientas de desarrollo (developer tooling) se ven significativamente mejoradas, ya que la información de tipos permite a los editores proporcionar sugerencias inteligentes de autocompletado y facilitar refactorizaciones complejas. A pesar de ser un lenguaje en constante evolución, el código TypeScript se transpila a JavaScript y todas las anotaciones y alias de tipos se eliminan en el proceso, sin añadir sobrecarga al tiempo de ejecución.
+
+\subsubsection{React}
+Es una biblioteca de JavaScript declarativa que facilita construcción de interfaces de usuario. Se centra en la composición de componentes, el manejo del estado y un flujo de datos unidireccional. La arquitectura de React fomenta una jerarquía de componentes, donde las partes más grandes de la interfaz de usuario se dividen en subcomponentes más pequeños, siguiendo principios como el de responsabilidad única. Esta modularidad facilita la construcción de interfaces complejas y su mantenimiento \cite{banks2020learning}.
+La comunicación entre componentes en React se gestiona principalmente a través de dos conceptos:
+
+\begin{itemize}
+    \item \textbf{Props:} Son la manera de enviar datos de un componente padre hacia sus componentes hijos. Se pasan a una función como argumentos. El uso de props hace que un componente padre pueda personalizar la apariencia y el comportamiento de sus componentes hijos, y una vez que se pasan, no pueden ser modificados por los componentes hijos. 
+    \item \textbf{State:} El estado representa el conjunto mínimo de datos cambiantes que su aplicación necesita recordar para que la interfaz de usuario sea interactiva. El estado permite que un componente realice un seguimiento de la información y la cambie en respuesta a las interacciones del usuario. El principio más importante para estructurar el estado es mantenerlo DRY, identificando la representación mínima absoluta del estado y calculando todo lo demás bajo demanda. Para determinar si algo debe ser estado, se considera si cambia con el tiempo, si se pasa como prop desde un padre o si se puede calcular a partir del estado o props existentes.
+\end{itemize}
+
+\subsubsection{NextJS}
+NextJS es un framework robusto utilizado para la creación de aplicaciones web mediante el uso de componentes React y otras funciones adicionales, logrando que estas sean dinámicas e interactivas. Entres sus principales características están el soporte de renderizado del lado del servidor, la generación de sitios estáticos y la fomentación de buenas prácticas dentro del desarrollo web, como rendimiento, SEO y seguridad \cite{Vercel}.
+
+\subsubsection{Tailwind CSS}
+Es un framework CSS que proporciona una vasta colección de clases de utilidad de bajo nivel. Estas clases tienen un propósito único el cual es construir interfaces de usuario completas sin necesidad de escribir directamente reglas CSS en archivos separados. Simplemente se aplican las clases de utilidad a los elementos HTML a través de su atributo class. Además, facilita la implementación de diseños responsivos mediante prefijos de puntos de interrupción y permite la reutilización de estilos y la adhesión a la estrategia DRY \cite{bhat2023ultimate}.
+
+Este framework soporta un alto nivel de personalización y permite manejar eventos y estados directamente a través de clases de utilidad.
+
+\subsection{Backend}
+El backend es la parte de una aplicación web que se ejecuta en el servidor y maneja la lógica de la aplicación y la gestión de datos. A diferencia de las páginas estáticas que solo sirven archivos, las páginas web dinámicas requieren que el servidor genere contenido en tiempo real, a menudo recuperando información de una base de datos. Las tecnologías de backend incluyen lenguajes de programación como JavaScript, PHP, Java, Python o Ruby, servidores web como nginx o Apache HTTP Server, y bases de datos, que pueden ser relacionales o NoSQL \cite{ackermann2023full}. 
+
+\subsubsection{Python}
+Es uno de los lenguajes de programación más populares en la actualidad, bastante utilizado en distintas áreas como en el desarrollo web, la ciencia de datos y el Machine Learning dada su eficiencia, la interoperabilidad y facilidad para aprender \cite{lutz2013learning}. En Python se puede utilizar bibliotecas predefinidas para el trabajo con bases de datos y la validación de la información contenida. A continuación se presenta alguna bibliotecas útiles para el desarrollo del middleware:
+
+\begin{itemize}
+    \item \textbf{Biblioteca Pydantic:} Esta biblioteca de Python permite validar datos mediante type hints para lo cual, se definen modelos para verificar y convertir datos automáticamente. Con esto, mejora la calidad de los datos y la robustez de aplicaciones Python.
+
+    \item \textbf{Biblioteca Pyodbc:} Esta biblioteca ayuda a la conexión de aplicaciones Python con bases de datos vía ODBC. Además, permite ejecutar consultas de forma eficiente desde distintos motores de bases de datos como SQL Server, PostgreSQL, MySQL entre otros.
+
+    \item \textbf{Biblioteca sqlparse:} Es una biblioteca de Python utilizado para analizar, validar y generar consultas SQL.
+\end{itemize}
+
+Para el desarrollo de aplicaciones web existen frameworks conocidos que fueron creados en Python tales como Django, Flask o FastApi.
+
+\subsubsection{FastAPI}
+FastAPI es un framework web moderno y de alto rendimiento que se distingue por un conjunto de características que lo hacen altamente eficiente para el desarrollo de APIs \cite{lubanovic2023fastapi}:
+
+\begin{itemize} 
+    \item Es uno de los frameworks web más rápidos en Python dado su rendimiento y por soportar la programación asíncrona permitiendo el manejo de grandes volúmenes de solicitudes con latencia mínima.
+    \item Utiliza Python type hints y modelos Pydantic para la validación automática de datos, garantizando que los datos de entrada se validen con precisión según los tipos y restricciones especificados, lo que lleva a un código más seguro.
+    \item FastAPI genera automáticamente documentación API interactiva a través del uso de interfaces como Swagger UI y ReDoc. Con esto, permite la prueba y exploración de endpoints en tiempo real desde el navegador, facilitando la comprensión de la API y aumentando la mantenibilidad del código.
+    \item Utiliza el servidor ASGI Uvicorn, el cual se distingue por su ligereza y su alto rendimiento en aplicaciones web asíncronas.
+    \item Reduce los errores y aumenta la velocidad de desarrollo a través de funciones de autocompletado y verificación de tipos en el editor.
+\end{itemize}
+
+\subsection{Bases de Datos}
+De acuerdo con Garcia-Molina \cite{garcia2008database},  una base de datos es una colección organizada de información que puede persistir durante mucho tiempo y es administrada por un Sistema Gestor de Bases de Datos (DBMS, por sus siglas en inglés).  Un DBMS tiene como objetivo almacenar, recuperar y gestionar esta información de manera eficiente \cite{silberschatz2011database}. 
+
+\subsubsection{Bases de Datos Relacionales}
+Las bases de datos relacionales conforman el tipo más común de almacenamiento de información que ha existido hasta la fecha. Son un conjunto de tablas con datos que comparten atributos similares y pueden establecer relaciones con otras tablas mediante algún atributo \cite{ricardo2009bases}.  Para garantizar confiabilidad en las transacciones, estas bases de datos cumplen con principios ACID:
+\begin{itemize}
+    \item \textbf{Atomicidad:} Una transacción es ``todo o nada''; o se completa por completo, o no se realiza ninguna de sus partes.
+    \item \textbf{Consistencia:} Cada transacción debe llevar la base de datos de un estado válido a otro estado válido.
+    \item \textbf{Aislamiento:} Las transacciones concurrentes no deben interferir entre sí; para el usuario, parece que se ejecutan una tras otra.
+    \item \textbf{Durabilidad:} Una vez que una transacción se confirma, sus cambios son permanentes y persisten incluso si hay fallas en el sistema. 
+\end{itemize}
+
+\subsubsection{SQL Server}
+SQL Server es un sistema de gestión de bases de datos relacionales desarrollado por Microsoft. Utiliza SQL como su lenguaje principal y soporta diversos tipos de datos incluyendo numéricos, caracteres, entre otros  \cite{ricardo2009bases}. Para la administración de infraestructuras SQL como SQL Server y Azure SQL Database SQL, Microsoft dispone del entorno SQL Server Management Studio (SSMS). Esta herramienta permite acceder, configurar, administrar y desarrollar todos los componentes de servidores SQL además de poder administrar bases de datos, realizar consultas y auditorías mediante scripts.
+
+\subsubsection{Bases de Datos NoSQL}
+Las bases de datos no relacionales, también conocidas como NoSQL (Not only SQL) ofrecen una alternativa de almacenamiento y gestión de grandes volúmenes de datos ya que no requiere una estructura formal para agregarlos \cite{sullivan2015nosql}. Con esto proporciona mayor flexibilidad al tratar con datos no uniformes o campos personalizados \cite{hills2016nosql}. 
+
+Existen diferentes tipos de bases de datos NoSQL entre los que se encuentran \cite{sadalage2013nosql}:
+\begin{itemize}
+    \item \textbf{Clave-valor:} Se almacenan como pares, siendo la clave el identificador único del valor asociado.
+    \item \textbf{Documentos:} Almacenan datos en documentos semiestructurados especialmente en formatos como JSON o XML.
+    \item \textbf{Familias de Columnas:} Organizan los datos en filas que tienen muchas columnas asociadas con una clave de fila.
+\end{itemize}
+
+\subsubsection{Bases de Datos Orientadas a Grafos}
+Las bases de datos orientadas a grafos representan una categoría importante de bases no relacionales al modelar los datos como una red de nodos y relaciones \cite{lal2015neo4j}.
+Este enfoque brinda alternativas para escenarios donde la complejidad de los datos reside en sus conexiones y no solo en el volumen de estos. Este modelo abarca cuatro componentes fundamentales \cite{vukotic2014neo4j}:
+\begin{itemize}
+    \item \textbf{Nodos:} Almacenan información de las entidades.
+    \item \textbf{Relaciones:} Conectan a los nodos de forma explícita, es decir, tiene un tipo, un nodo origen, un nodo destino y una dirección.
+    \item \textbf{Propiedades:} Son pares clave-valor que permite agregar atributos tanto a nodos como a relaciones.
+    \item \textbf{Etiquetas:} Permiten agrupar y categorizar nodos.
+\end{itemize}
+
+\subsubsection{Neo4j}
+Es una base de datos de grafos diseñada para gestionar y recorrer grandes cantidades de datos conectados con facilidad. Su infraestructura y formato de almacenamiento optimizado para el manejo de grafos ofrece mejoras significativas de velocidad y rendimiento con respecto a otras bases de datos \cite{van2014learning}.
+Tiene un lenguaje de consulta propio llamado Cypher. Este permite a los usuarios describir el patrón de datos que desean encontrar facilitando las optimizaciones de búsqueda y mejorando la legibilidad \cite{baton2017learning}. 
+
+\subsubsection{Neo4j Desktop y Neo4j Browser}
+Estas herramientas sirven para gestionar bases de datos Neo4j. Neo4j Desktop permite la exploración y uso de este tipo de bases de datos de forma local. Por otro lado, en Neo4j Browser se puede visualizar los resultados de consultas sobre una base de datos específica a través de scripts y manipular los datos que contiene, ya sea los nodos o relaciones \cite{baton2017learning}.
+
+\subsection{Herramientas de desarrollo, gestión y pruebas}
+\subsubsection{Figma}
+Es una herramienta de diseño colaborativa basada en el navegador, que permite a los usuarios trabajar juntos en tiempo real en la misma interfaz de usuario. Destaca por sus potentes componentes reutilizables y su sistema flexible de anulaciones. Ofrece entrega integrada para desarrolladores, permitiendo copiar fragmentos de código y activos directamente del diseño. Además, facilita el prototipado, ya que los diseños siempre están en la nube, eliminando la necesidad de cargas manuales \cite{staiano2022designing}.
+
+\subsubsection{Git}
+Git es un sistema de control de versiones distribuido que almacena datos como una serie de instantáneas del proyecto. Su modelo de ramificación es una característica fundamental, permitiendo crear y destruir ramas de forma rápida y sencilla para aislar el trabajo en temas específicos. Permite trabajar con múltiples repositorios remotos y operar sin conexión. Git se utiliza principalmente a través de la línea de comandos para acceder a toda su funcionalidad, ofreciendo además herramientas para reescribir la historia localmente antes de compartirla \cite{chacon2014pro}.
+
+\subsubsection{GitHub}
+GitHub es el mayor proveedor de alojamiento de repositorios Git y un punto central para la colaboración de desarrolladores en proyectos de código abierto. Su flujo de trabajo se centra en las Pull Requests (PRs), que facilitan la discusión, revisión y fusión de cambios de manera colaborativa directamente en la plataforma web. Permite a los usuarios bifurcar proyectos, trabajar en sus propias copias y luego solicitar la integración de sus cambios. GitHub soporta Markdown con características especiales como listas de tareas y fragmentos de código, además de ofrecer un sistema de notificaciones y funcionalidades como la automatización de tareas \cite{chacon2014pro}.
+
+\subsubsection{Visual Studio Code}
+Visual Studio Code es un editor de código potente y completo que funciona en Mac, Windows y Linux. Una de sus principales ventajas es su comprensión de todo el proyecto, incluyendo la relación entre archivos y soporte para múltiples lenguajes como Python, JavaScript y CSS. Ofrece autocompletado de código, navegación y refactorización inteligentes, y facilita la gestión de entornos virtuales y dependencias. Visual Studio Code también integra control de versiones para sistemas como Git, y herramientas para el desarrollo web frontend y backend, razón por la cual ha sido la elegida para el desarrollo de este trabajo \cite{kennedy2019effective}.
+
+% Referenciar y especificar que será utilizado tanto para el desarrollo front y back
+
+\subsubsection{Postman}
+Esta herramienta diseñada para la prueba y el desarrollo de APIs, permite a los usuarios crear, organizar y enviar solicitudes API en colecciones. Ofrece amplias opciones de autorización para APIs, incluyendo Basic Auth, Bearer Tokens, y OAuth, lo que facilita la interacción con diversas seguridades. Permite la creación de scripts de validación de pruebas y soporta pruebas basadas en datos para escalar los tests. Además, Postman facilita el diseño de especificaciones API, como OpenAPI, y puede generar automáticamente mocks y pruebas a partir de estas especificaciones. La herramienta también soporta la documentación de APIs directamente en la aplicación y la gestión de variables \cite{westerveld2021api}.
+
+\subsection{Pruebas de Software}
+Son una actividad fundamental en la ingeniería de software, cuyo objetivo es demostrar que un programa hace lo que se pretende y descubrir defectos antes de que el sistema se use. Al probar el software, se ejecuta el programa con datos artificiales y se verifican los resultados para buscar errores, anomalías o información sobre los atributos no funcionales del programa. Es importante destacar que las pruebas solo pueden mostrar la presencia de errores, no su ausencia. Siempre existe la posibilidad de que una prueba pasada por alto revele más problemas con el sistema \cite{sommerville2011software}.
+\subsubsection{Pruebas Funcionales}
+Las pruebas funcionales se refieren directamente a la verificación de los servicios y funcionalidades específicas que el sistema debe proveer. Se basan en los requerimientos funcionales, que son enunciados que describen cómo el sistema debe reaccionar a entradas particulares y cómo debe comportarse en situaciones específicas. Pueden ser descripciones abstractas o muy detalladas de las funciones del sistema, sus entradas, salidas y excepciones. El objetivo de estas pruebas es demostrar que el software ha implementado adecuadamente sus requerimientos \cite{sommerville2011software}.
+
+\subsubsection{Pruebas No Funcionales}
+Las pruebas no funcionales se ocupan de las limitaciones o restricciones sobre los servicios o funciones que ofrece el sistema. Estas restricciones pueden relacionarse con propiedades emergentes del sistema como la fiabilidad, el rendimiento, la seguridad, la usabilidad y la protección. Son a menudo más críticas que los requerimientos funcionales individuales, ya que el fracaso en cumplir con un requerimiento no funcional puede hacer que todo el sistema sea inútil. Siempre que sea posible, los requerimientos no funcionales deben escribirse de manera cuantitativa y medible, para que puedan ser probados objetivamente \cite{sommerville2011software}.
+

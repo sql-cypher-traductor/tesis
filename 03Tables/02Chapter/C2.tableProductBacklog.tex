@@ -1,0 +1,69 @@
+\begin{longtable}{|c|c|p{0.35\textwidth}|c|c|}
+    \caption{Product backlog del proyecto.}
+    \label{tab:productBacklog} \\
+    \hline
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{HU}} & \multicolumn{1}{|c|}{\textbf{Código de tarea}} & \multicolumn{1}{|c|}{\textbf{Tarea}} & \multicolumn{1}{c|}{\textbf{Complejidad}} & \multicolumn{1}{c|}{\textbf{Prioridad}}  \\
+    \hline
+    \endfirsthead
+    
+    \hline
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{HU}} & \multicolumn{1}{|c|}{\textbf{Código de tarea}} & \multicolumn{1}{|c|}{\textbf{Tarea}} & \multicolumn{1}{c|}{\textbf{Complejidad}} & \multicolumn{1}{c|}{\textbf{Prioridad}}  \\
+    \hline
+    \endhead
+    
+    \multicolumn{5}{|r|}{\textit{Continúa en la siguiente página...}} \\
+    \endfoot
+    
+    \endlastfoot
+    
+    \multirow{4}{*}{HU01} & T1.1 & Desarrollar la lógica de parseo para identificar el tipo de sentencia SQL y mapeo para Cypher. & 8 & 3 \\
+    \cline{2-5}
+     & T1.2 & Implementar un endpoint para la traducción de SQL a Cypher. & 2 & 3 \\
+    \cline{2-5}
+     & T1.3 & Diseñar la pantalla para traducción. & 3 & 3 \\
+    \cline{2-5}
+     & T1.4 & Desarrollar de la vista para traducción. & 2 & 3 \\
+    \hline
+    \multirow{3}{*}{HU02} & T2.1 & Desarrollar la lógica para detección de JOINs y claves foráneas. & 8 & 2 \\
+    \cline{2-5}
+     & T2.2 & Implementar el mapeo de claves foráneas a relaciones de grafos. & 5 & 2 \\
+    \cline{2-5}
+     & T2.3 & Ajustar la visualización de consultas que incluyan JOINs. & 1 & 1 \\
+    \hline
+    \multirow{3}{*}{HU03} & T3.1 & Diseñar el componente para visualización de errores. & 1 & 2 \\
+    \cline{2-5}
+     & T3.2 & Desarrollar el componente para visualización de errores. & 1 & 2 \\
+    \cline{2-5}
+     & T3.3 & Implementar el detalle de error y sugerencia de corrección. & 3 & 2 \\
+    \hline
+    \multirow{4}{*}{HU04} & T4.1 & Desarrollar la lógica para conexión a una base de datos Neo4j. & 5 & 3 \\
+    \cline{2-5}
+     & T4.2 & Implementar un endpoint para conectarse a la base de datos de grafos. & 3 & 3 \\
+    \cline{2-5}
+     & T4.3 & Diseñar el formulario de conexión. & 2 & 2 \\
+    \cline{2-5}
+     & T4.4 & Desarrollar el formulario de conexión. & 2 & 3 \\
+    \hline
+    \multirow{4}{*}{HU05} & T5.1 & Implementar la lógica para la ejecución de la traducción en la base de datos de grafos. & 5 & 3 \\
+    \cline{2-5}
+     & T5.2 & Implementar un endpoint para la ejecución de la traducción obtenida en la base de datos de Neo4j. & 3 & 3 \\
+    \cline{2-5}
+     & T5.3 & Diseñar los resultados de la ejecución. & 1 & 2 \\
+    \cline{2-5}
+     & T5.4 & Desarrollar del área de resultados con opciones de visualización en formato tabular y JSON. & 3 & 3 \\
+    \hline
+    \multirow{3}{*}{HU06} & T6.1 & Implementar la lógica para el almacenamiento de consultas. & 2 & 1 \\
+    \cline{2-5}
+     & T6.2 & Desarrollar la lógica para rellenar los cuadros de texto de traducción al seleccionar una consulta guardada. & 1 & 1 \\
+    \cline{2-5}
+     & T6.3 & Diseñar el historial de consultas. & 2 & 2 \\
+    \cline{2-5}
+     & T6.4 & Desarrollar la vista del historial de consultas. & 2 & 3 \\
+    \hline
+    \multirow{2}{*}{HU07} & T7.1 & Implementar la transformación de JSON a CSV. & 3 & 1 \\
+    \cline{2-5}
+     & T7.2 & Desarrollar la función de descarga de resultados. & 1 & 1 \\
+    \hline
+\end{longtable}

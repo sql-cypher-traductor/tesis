@@ -1,0 +1,35 @@
+El auge de los datos no estructurados y la necesidad de sistemas escalables horizontalmente han impulsado la creciente adopción de bases de datos NoSQL, las cuales ofrecen modelos de datos más flexibles y eficientes para grandes volúmenes de información en comparación con las bases de datos relacionales tradicionales. Sin embargo, la migración e integración de aplicaciones existentes, así como la curva de aprendizaje asociada a los diferentes lenguajes de consulta y APIs de cada base de datos NoSQL, representan un desafío significativo para los desarrolladores. Esta problemática dificulta una transición fluida desde entornos SQL bien establecidos hacia el paradigma NoSQL.
+
+En este contexto, el componente desarrollado en este proyecto es un middleware SQL, diseñado para actuar como una capa de abstracción entre las aplicaciones que utilizan consultas SQL y los diversos sistemas de bases de datos NoSQL, específicamente aquellos de tipo orientados a grafos. La finalidad principal de este middleware es traducir las consultas SQL en operaciones compatibles con los lenguajes nativos de las bases de datos NoSQL seleccionadas, eliminando la necesidad de que los desarrolladores adquieran un conocimiento profundo en un lenguaje de consulta orientado a grafos como Cypher. Al proveer esta capa de traducción, el middleware simplifica la integración de aplicaciones existentes con entornos NoSQL y reduce significativamente la complejidad de la migración de datos y funcionalidades.
+
+El desarrollo de este middleware implica la construcción de un parser SQL capaz de analizar y descomponer las consultas SQL en componentes manejables. Posteriormente, se implementará un conector para bases de datos orientadas a grafos utilizando el motor de Neo4j. Este conector será responsable de transformar la representación intermedia de las consultas SQL al lenguaje de consulta Cypher, propio de la base de datos orientada a grafos Neo4j. Además, se desarrollará un conector de entrada para el middleware que recibirá las consultas SQL directamente, y una interfaz de usuario para que los desarrolladores puedan interactuar con el sistema, ingresar consultas SQL y visualizar los resultados traducidos y ejecutados en el sistema NoSQL apropiado. Este enfoque integral busca mejorar la interoperabilidad entre los paradigmas SQL y NoSQL, ofreciendo una solución práctica para gestionar la complejidad de los entornos de datos híbridos.
+
+ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------- Section 1 ---------------%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Objetivo general}
+\label{chapter01-section01:Objetivo General}
+\input{../04Sections/03ContentOfDocument/01Chapter/01-01-Section}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------- Section 2 ---------------%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Objetivos específicos}
+\label{chapter01-section02:Objetivos Específicos}
+\input{../04Sections/03ContentOfDocument/01Chapter/01-02-Section}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------- Section 3 ---------------%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Alcance}
+\label{chapter01-section03:Alcance}
+\input{../04Sections/03ContentOfDocument/01Chapter/01-03-Section}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%--------------- Section 4 ---------------%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Marco teórico}
+\label{chapter01-section03:Marco teórico}
+\input{../04Sections/03ContentOfDocument/01Chapter/01-04-Section}
