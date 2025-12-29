@@ -43,6 +43,7 @@
 \RequirePackage{booktabs}                                               % For \toprule etc. in tables
 \RequirePackage{multirow}
 \RequirePackage{longtable}
+\RequirePackage{enumitem}
 \RequirePackage{makecell}
 \RequirePackage[table]{xcolor}
 \usepackage{datetime}
