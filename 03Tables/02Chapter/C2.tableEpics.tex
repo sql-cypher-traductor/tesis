@@ -1,17 +1,30 @@
-\begin{table}[H]
-    \centering
-    \caption{Épicas del proyecto.}
-    \label{tab:epicasDeUsuario}
-    \begin{tabular}{|l|p{0.25\textwidth}|p{0.4\textwidth}|p{0.2\textwidth}|}
+\begin{longtable}{|l|p{0.2\textwidth}|p{0.45\textwidth}|p{0.2\textwidth}|}
+    \caption{Épicas de Usuario del proyecto.}
+    \label{tab:epicasDeUsuario} \\
     \hline
     \rowcolor{gray!50}
-    \multicolumn{1}{|c|}{\textbf{N°}} & \multicolumn{1}{c|}{\textbf{Épica}} & \multicolumn{1}{c|}{\textbf{Descripción}} & \multicolumn{1}{c|}{\textbf{Historias de Usuario}} \\
+    \multicolumn{1}{|c|}{\textbf{ID}} & \multicolumn{1}{c|}{\textbf{Épica}} & \multicolumn{1}{c|}{\textbf{Descripción}} & \multicolumn{1}{c|}{\textbf{Historias de Usuario}} \\
     \hline
-    1 & Traducción de consultas & Facilita el análisis y traducción de sentencias SQL a su equivalente en lenguaje Cypher & HU01, HU02 \\
+    \endfirsthead
+    
     \hline
-    2 & Conexion y ejecución de consultas & Permite al usuario conectarse a una base de datos de grafos específica y ejecutar consultas traducidas de forma directa. & HU04, HU05 \\
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{ID}} & \multicolumn{1}{c|}{\textbf{Épica}} & \multicolumn{1}{c|}{\textbf{Descripción}} & \multicolumn{1}{c|}{\textbf{Historias de Usuario}} \\
     \hline
-    3 & Gestión de utilidades y retroalimentación & Permite al usuario el manejo de consultas anteriores y resultados según sea su necesidad, además de proporcionar retroalimentación que le brinde una mejor experiencia de uso. & HU03, HU06 y HU07 \\
+    \endhead
+    
+    \multicolumn{4}{r}{\textit{Continúa en la siguiente página...}} \\
+    \endfoot
+    
+    \endlastfoot
+    
+    E01 & Traducción y almacenamiento de consultas & Se encarga del análisis, la traducción de sentencias SQL a Cypher y el manejo de un historial de consultas. & HU01, HU02, \newline HU03, HU04 y \newline HU07 \\
     \hline
-    \end{tabular}
-\end{table}
+    E02 & Gestión de conexiones y ejecución de consultas & Facilita la conexión a una base de datos de grafos y la ejecución de las sentencias Cypher obtenidas. & HU05, HU06 y \newline HU08 \\
+    \hline
+    E03 & Autenticación y administración de permisos & Facilita al usuario el registro e inicio de sesión, además del manejo de permisos para la interacción con las bases de datos. & HU09, HU10, \newline HU11 y HU12 \\
+    \hline
+    E04 & Logs de auditoría y métricas de rendimiento & Permite dar seguimiento sobre actividades ejecutadas desde la aplicación y dar un resumen estadístico en cuanto a la traducción y ejecución de consultas. & HU13 y HU14 \\
+    \hline
+    
+\end{longtable}
