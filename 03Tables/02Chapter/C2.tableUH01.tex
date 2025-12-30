@@ -11,34 +11,34 @@
 
     \textbf{ID:} HU01 & \textbf{Usuario:} Desarrollador \\
     \hline
-    \multicolumn{2}{|l|}{\textbf{Título:} Traducción de consultas básicas} \\
+    \multicolumn{2}{|l|}{\textbf{Título:} Traducción de operaciones DML básicas} \\
     \hline
     \textbf{Prioridad en negocio:} Alta & \textbf{Riesgo en desarrollo:} Alto \\
     \hline
-    \textbf{Estimación:} 8 & \textbf{Iteración asignada:} 1 \\
+    \textbf{Estimación:} 8 & \textbf{Iteración asignada:} Sprint 1 \\
     \hline
     \multicolumn{2}{|p{0.92\textwidth}|}{
         \textbf{Historia de Usuario:}
         \begin{itemize}[nosep, leftmargin=0.35cm, label={}, after=\vspace{0.5em}]
             \item \textbf{Como} desarrollador,
-            \item \textbf{Quiero} traducir sentencias SELECT, CREATE, UPDATE o DELETE simples a lenguaje Cypher,
+            \item \textbf{Quiero} traducir sentencias SQL simples a lenguaje Cypher,
             \item \textbf{Para} interactuar con bases de datos orientadas a grafos sin tener que aprender un nuevo lenguaje de consulta.
         \end{itemize}} \\
     \hline
     \multicolumn{2}{|p{0.92\textwidth}|}{
         \textbf{Criterios de aceptación:} 
         \begin{itemize}[nosep, leftmargin=0.75cm, after=\vspace{0.5em}]
-            \item El usuario debe agregar una sentencia SQL válida para ser traducida.
-            \item Las sentencias soporta cláusulas, operadores y funciones básicas.
-            \item Al ingresar una sentencia válida, el sistema devolverá su equivalente en lenguaje Cypher.
-            \item Las consultas traducidas serán agregadas al historial de consultas.
+            \item Se debe agregar una sentencia SQL válida.
+            \item Las operaciones soportadas incluyen SELECT, INSERT, UPDATE y DELETE.
+            \item El sistema debe permitir el uso de la cláusula WHERE, las palabras reservadas ALL, DISTINCT y los operadores lógicos NOT, AND \& OR.
+            \item Al seleccionar la opción Traducir, se debe mostrar la sentencia equivalente en lenguaje Cypher.
+            \item Si la sentencia contiene errores de sintaxis o no es soportada, se debe mostrar un mensaje.
         \end{itemize}} \\
     \hline
     \multicolumn{2}{|p{0.92\textwidth}|}{
         \textbf{Observaciones:}
         \begin{itemize}[nosep, leftmargin=0.75cm, after=\vspace{0.5em}]
-            \item Verificar que la consulta a ser traducida no contenga errores de sintaxis.
-            \item La traducción a Cypher aparecerá junto a la sentencia SQL correspondiente.
+            \item Verificar que la consulta ingresada no contenga errores para obtener la traducción correspondiente.
         \end{itemize}} \\
     \hline
 \end{longtable}
