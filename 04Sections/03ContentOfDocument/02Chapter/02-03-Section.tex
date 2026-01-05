@@ -180,3 +180,38 @@ La revisión final sirvió para presentar el producto completo. Se demostró la 
     \item \textbf{¿Qué se puede mejorar?} \newline
     Mirando hacia atrás en todo el proyecto, se podría haber integrado la funcionalidad de exportación antes, ya que resultó ser muy útil para las pruebas de los propios desarrolladores.
 \end{itemize}
+
+\subsection{Sprint 6}
+\subsubsection{Sprint 6 Planning}
+El último sprint, el Sprint 6, se destinó a funcionalidades de valor añadido y cierre del desarrollo. El objetivo principal fue dotar al sistema de capacidades de exportación de datos, permitiendo a los usuarios extraer la información obtenida para su uso en otras herramientas.
+
+\subsubsection{Sprint 6 Backlog}
+La Tabla \ref{tab:sprintBacklog6} detalla las tareas del Sprint 6.
+
+\input{../03Tables/02Chapter/C2.tableSprintBacklog6}
+
+
+\subsubsection{Ejecución del Sprint 6}
+Las tareas de este sprint se centraron en la manipulación de datos para exportación. Se desarrolló un servicio de transformación capaz de convertir la estructura jerárquica del JSON (resultado de Neo4j) a un formato plano CSV (T7.1). Aunque esta lógica se ejecuta principalmente del lado del cliente para optimizar el rendimiento, se implementaron validaciones para asegurar la integridad de los datos antes de la conversión.
+
+Complementando esto, se implementó la función de descarga en el frontend (T7.2), integrando un botón que desencadena la conversión y genera el archivo descargable para el usuario. Además, se aprovechó este sprint para realizar pruebas finales de integración y pulir detalles estéticos de la interfaz antes de la entrega final.
+
+\paragraph{Pruebas de Integración}
+Dado que la exportación depende de la correcta estructura de los datos recibidos, se realizaron pruebas de flujo completo:
+\begin{itemize}
+    \item \textbf{Validación de Estructura JSON:} Se utilizó Postman para verificar que el endpoint de ejecución (\texttt{/api/execute}) retornara siempre un JSON válido y bien formado, requisito indispensable para el parser de CSV.
+    \item \textbf{Pruebas de Descarga:} Se verificó manualmente que los archivos generados pudieran abrirse correctamente en software de hojas de cálculo y que los caracteres especiales (tildes, ñ) se codificaran correctamente.
+\end{itemize}
+
+% Se sugiere agregar aquí un fragmento de código de la función de conversión JSON a CSV.
+
+\subsubsection{Sprint 6 Review}
+La revisión final sirvió para presentar el producto completo. Se demostró la nueva funcionalidad de exportación descargando los resultados de una consulta compleja y abriéndolos en una hoja de cálculo externa. El sistema fue validado en su totalidad, cumpliendo con los requisitos de traducción, ejecución y gestión de datos definidos al inicio del proyecto.
+
+\subsubsection{Sprint 6 Retrospective}
+\begin{itemize}
+    \item \textbf{¿Qué salió bien?} \newline
+    El sprint fue menos cargado, lo que permitió dedicar tiempo a la estabilización del código y corrección de pequeños bugs visuales. La funcionalidad de exportación funcionó a la primera gracias a las pruebas unitarias previas.
+    \item \textbf{¿Qué se puede mejorar?} \newline
+    Mirando hacia atrás en todo el proyecto, se podría haber integrado la funcionalidad de exportación antes, ya que resultó ser muy útil para las pruebas de los propios desarrolladores.
+\end{itemize}

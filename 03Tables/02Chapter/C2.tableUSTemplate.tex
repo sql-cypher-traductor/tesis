@@ -1,6 +1,6 @@
 \begin{longtable}[c]{|m{0.46\textwidth}|m{0.46\textwidth}|}
-    \caption{Historia de Usuario 01}
-    \label{tab:hu01} \\
+    \caption{Historia de Usuario QTE-01}
+    \label{tab:qte01} \\
     
     \hline
     \endfirsthead
@@ -9,7 +9,7 @@
     \endfoot
     \endlastfoot
 
-    \textbf{ID:} HU01 & \textbf{Usuario:} Desarrollador \\
+    \textbf{ID:} QTE-01 & \textbf{Usuario:} Desarrollador \\
     \hline
     \multicolumn{2}{|l|}{\textbf{Título:} Traducción de operaciones DML básicas} \\
     \hline
@@ -29,16 +29,10 @@
         \textbf{Criterios de aceptación:} 
         \begin{itemize}[nosep, leftmargin=0.75cm, after=\vspace{0.5em}]
             \item Se debe agregar una sentencia SQL válida.
-            \item Las operaciones soportadas incluyen SELECT, INSERT, UPDATE y DELETE.
-            \item El sistema debe permitir el uso de la cláusula WHERE, las palabras reservadas ALL, DISTINCT y los operadores lógicos NOT, AND \& OR.
+            \item Debe soportar las sentencias: \textbf{SELECT}, \textbf{INSERT INTO}, \textbf{UPDATE} y \textbf{DELETE}.
+            \item El sistema debe permitir el uso de la cláusula \textbf{WHERE}, las palabras reservadas \textbf{ALL}, \textbf{DISTINCT} y los operadores lógicos \textbf{NOT}, \textbf{AND} \& \textbf{OR}.
             \item Al seleccionar la opción Traducir, se debe mostrar la sentencia equivalente en lenguaje Cypher.
             \item Si la sentencia contiene errores de sintaxis o no es soportada, se debe mostrar un mensaje.
-        \end{itemize}} \\
-    \hline
-    \multicolumn{2}{|p{0.92\textwidth}|}{
-        \textbf{Observaciones:}
-        \begin{itemize}[nosep, leftmargin=0.75cm, after=\vspace{0.5em}]
-            \item Verificar que la consulta ingresada no contenga errores para obtener la traducción correspondiente.
         \end{itemize}} \\
     \hline
 \end{longtable}

@@ -1,4 +1,4 @@
-\begin{longtable}[c]{|c|m{0.23\textwidth}|m{0.43\textwidth}|m{0.15\textwidth}|}
+\begin{longtable}[c]{|c|m{0.16\textwidth}|m{0.43\textwidth}|m{0.21\textwidth}|}
     \caption{Épicas de Usuario del proyecto.}
     \label{tab:epicasDeUsuario} \\
     \hline
@@ -18,13 +18,13 @@
     
     \endlastfoot
     
-    E01 & Traducción y almacenamiento de consultas & Se encarga del análisis, la traducción de sentencias SQL a Cypher y el manejo de un historial de consultas. & HU01, HU02, HU03, HU04 y HU07 \\
+    AUM & Autenticación y gestión de usuarios & Facilita al usuario con las funciones de autenticación, además de la administración de cuentas. & AUM-01, AUM-02, AUM-03, AUM-04, AUM-05 \\
     \hline
-    E02 & Gestión de conexiones y ejecución de consultas & Facilita la conexión a una base de datos de grafos y la ejecución de las sentencias Cypher obtenidas. & HU05, HU06 y HU08 \\
+    CON & Gestión de conexiones y esquemas & Permite configurar las conexiones a las bases de datos respectivas y obtener los esquemas relacionales para ingresar sentencias SQL válidas. & CON-01, CON-02, CON-03, CON-04 \\
     \hline
-    E03 & Autenticación y administración de permisos & Facilita al usuario el registro e inicio de sesión, además del manejo de permisos para la interacción con las bases de datos. & HU09, HU10, HU11 y HU12 \\
+    QTE & Traducción y ejecución & Se encarga del análisis, traducción y ejecución de consultas traducidas en Neo4j. Incluye el historial de consultas y la visualización de los resultados de ejecución. & QTE-01, QTE-02, QTE-03, QTE-04, QTE-05, QTE-06 \\
     \hline
-    E04 & Logs de auditoría y métricas de rendimiento & Permite dar seguimiento sobre actividades ejecutadas desde la aplicación y dar un resumen estadístico en cuanto a la traducción y ejecución de consultas. & HU13 y HU14 \\
+    OBS & Observabilidad y retralimentación & Facilita la realización de auditoría y monitoreo de rendimiento, además de brindar retroalimentación clara sobre errores detectados. & OBS-01, OBS-02, OBS-03 \\
     \hline
     
 \end{longtable}
