@@ -21,22 +21,22 @@ Para obtener la estimación se utilizó la técnica \textbf{Planning Poker}, mis
 \input{../03Tables/02Chapter/C2.tableUSTemplate}
 
 \subsubsection{Product Backlog}
-Cada HU fue dividida en tareas específicas, útiles para realizar un trabajo organizado y eficiente. A través de un análisis colaborativo y estricto con el equipo Scrum, cada tarea fue valorada en términos de prioridad y complejidad utilizando una vez más el \textbf{Planning Poker}.
+Para poder cumplir con un trabajo organizado y eficaz cada HU fue dividida en tareas específicas a través de un análisis riguroso y colectivo entre todo el equipo Scrum. Cada tarea fue valorada en términos de prioridad y complejidad utilizando las escalas de valoración que se encuentran en las Tablas \ref{tab:prioridad} y \ref{tab:complejidad}.
 
-La Tabla \ref{tab:prioridad} contiene la escala de valoración propuesta para medir el impacto de cada tarea para satisfacer las necesidades del negocio.
+La prioridad es el impacto que cada tarea tiene para satisfacer las necesidades del negocio. En este caso el rango fue dado de 1 a 3, siendo 1 la de mayor relevancia y 3 la de menor impacto.
 
 \input{../03Tables/02Chapter/C2.tablePriority}
 
-Por su parte, en la Tabla \ref{tab:complejidad} se observa el rango de valoración elegido para indicar la complejidad que conlleva la ejecución de las tareas, en términos de recursos utilizados, tiempo y esfuerzo empleado.
+Por su parte, la complejidad radica en la complejidad que conlleva la ejecución de las tareas, de acuerdo a los recursos utilizados, el tiempo y esfuerzo empleado. El rango fue definido utilizando una vez más la serie de Fibonacci, donde 1 indica una tarea con muy poca complejidad y 8 para las tareas de mayor esfuerzo.
 
 \input{../03Tables/02Chapter/C2.tableComplexity}
 
-La Tabla \ref{tab:productBacklog} expone el Product Backlog generado y valorado bajo los criterios mencionados. Esto ayudará a la asignación equitativa de tareas durante la planificación de sprints.  
+La Tabla \ref{tab:productBacklog} expone el Product Backlog generado y valorado bajo los criterios mencionados. Esto favorecerá en la asignación de tareas durante la planificación de sprints.  
 
 \input{../03Tables/02Chapter/C2.tableProductBacklog}
 
 \subsubsection{Planificación de Sprints}
-Con el objetivo de organizar las tareas de la mejor manera para entregar un incremento funcional al final de cada iteración, se dividió el trabajo en 6 sprints, incluyendo un sprint 0 necesario para la configuración del entorno de desarrollo, el diseño de arquitectura del sistema y las interfaces de usuario respectivas.
+Con el objetivo de organizar las tareas de la mejor manera para entregar un incremento funcional al final de cada iteración, se dividió el trabajo en 6 sprints, incluyendo un sprint 0 netamente relacionado con actividades de adecuar el editor de código y actividades relacionadas a la fase de diseño del ciclo de vida del desarrollo de software.
 
 En la Tabla \ref{tab:sprints}, se detalla la planificación de cada sprint, donde se indica la duración en semanas, los objetivos a cumplir y las tareas asignadas a cada uno de ellos.
 
@@ -45,15 +45,19 @@ En la Tabla \ref{tab:sprints}, se detalla la planificación de cada sprint, dond
 
 \subsection{Sprint 0}
 \subsubsection{Sprint 0 Planning}
-Durante el Sprint 0 se realizarán actividades relacionadas a la configuración del entorno de trabajo y el diseño de la arquitectura del sistema, la bases de datos para  se estableció la arquitectura del sistema y el diseño de las interfaces de usuario así también, se preparó el entorno de trabajo, el cual incluye la creación de los repositorios y la estructura del código tanto para el backend como para el frontend, de acuerdo al stack tecnológico elegido.
+En la planificación del Sprint 0 se establecieron las tareas que formarán parte de esta primera iteración, mismas que serán guía para el desarrollo del sistema. El objetivo principal de cumplir con este backlog es la configuración del entorno de desarrollo, el diseño de la arquitectura del sistema y el prototipado de las interfaces de usuario.
 
 \subsubsection{Sprint 0 Backlog}
-Este backlog incluye tareas relacionadas al diseño del middleware que nos ayudará como guía y base para los próximos sprints. La Tabla \ref{tab:sprintBacklog0} detalla las tareas destinadas a esta iteración .
+A continuación, en la Tabla \ref{tab:sprintBacklog0} se puede visualizar la lista de tareas correspondientes al Sprint 0.
 
 \input{../03Tables/02Chapter/C2.tableSprintBacklog0}
 
 
 \subsubsection{Ejecución del Sprint 0}
+En la ejecución de este sprint se llevaron a cabo las siguientes actividades clave:
+\paragraph{Diseño de la arquitectura}
+La arquitectura del sistema 
+
 Durante la ejecución de este Sprint, el equipo se centró en establecer los cimientos del proyecto. Las actividades principales se dividieron en el diseño de la experiencia de usuario y la configuración técnica inicial.
 
 En primer lugar, se abordó el diseño de las interfaces de usuario, asegurando que la interacción con el \textit{middleware} fuera intuitiva y eficiente. Se diseñaron las pantallas clave para la traducción de sentencias (T1.3), la visualización de errores (T3.1), el formulario de conexión a la base de datos (T4.3), la presentación de resultados de ejecución (T5.3) y el historial de consultas (T6.3). Estos diseños sirvieron como guía visual para el desarrollo del frontend en los sprints subsiguientes.

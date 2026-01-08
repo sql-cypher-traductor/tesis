@@ -21,18 +21,21 @@
         \textbf{Historia de Usuario:}
         \begin{itemize}[nosep, leftmargin=0.35cm, label={}, after=\vspace{0.5em}]
             \item \textbf{Como} desarrollador,
-            \item \textbf{Quiero} traducir sentencias SQL simples a lenguaje Cypher,
-            \item \textbf{Para} interactuar con bases de datos orientadas a grafos sin tener que aprender un nuevo lenguaje de consulta.
+            \item \textbf{Quiero} traducir sentencias SELECT a lenguaje Cypher,
+            \item \textbf{Para} obtener datos específicos de una base de datos orientada a grafos.
         \end{itemize}} \\
     \hline
     \multicolumn{2}{|p{0.92\textwidth}|}{
         \textbf{Criterios de aceptación:} 
         \begin{itemize}[nosep, leftmargin=0.75cm, after=\vspace{0.5em}]
-            \item Se debe agregar una sentencia SQL válida.
-            \item Debe soportar las sentencias: \textbf{SELECT}, \textbf{INSERT INTO}, \textbf{UPDATE} y \textbf{DELETE}.
-            \item El sistema debe permitir el uso de la cláusula \textbf{WHERE}, las palabras reservadas \textbf{ALL}, \textbf{DISTINCT} y los operadores lógicos \textbf{NOT}, \textbf{AND} \& \textbf{OR}.
-            \item Al seleccionar la opción Traducir, se debe mostrar la sentencia equivalente en lenguaje Cypher.
-            \item Si la sentencia contiene errores de sintaxis o no es soportada, se debe mostrar un mensaje.
+            \item El sistema deberá traducir  la sentencia \texttt{SELECT} para todas las columnas o solo columnas específicas de una tabla.
+            \item El sistema deberá soportar la cláusula \texttt{WHERE}, operadores de comparación (\texttt{=}, \texttt{<}, \texttt{<=}, \texttt{>}, \texttt{>=}, \texttt{<>}) y operadores lógicos (\texttt{AND}, \texttt{OR} y \texttt{NOT}).
+            \item El sistema deberá traducir la cláusula \texttt{ORDER BY} junto a la forma de ordenamiento (\texttt{ASC} o \texttt{DESC}).
+            \item El sistema deberá traducir correctamente las palabras reservadas \texttt{DISTINCT}, y \texttt{LIMIT/TOP}.
+            \item El usuario deberá ingresar una sentencia SQL que cumpla con las restricciones indicadas.
+            \item El usuario deberá seleccionar la opción \textbf{Traducir} para visualizar la sentencia en lenguaje Cypher equivalente a la que ingresó.
+            \item Si la sentencia tiene errores de sintaxis o no es soportada, el sistema indicará un mensaje de error y no podrá ser traducida.
+            \item Las consultas traducidas, serán agregadas automáticamente al historial.
         \end{itemize}} \\
     \hline
 \end{longtable}

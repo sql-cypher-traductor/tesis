@@ -1,4 +1,4 @@
-\begin{longtable}[c]{|c|c|m{0.48\textwidth}|m{0.17\textwidth}|}
+\begin{longtable}[c]{|c|c|m{0.5\textwidth}|m{0.17\textwidth}|}
     \caption{Planificación de Sprints.}
     \label{tab:sprints} \\
     \hline
@@ -19,39 +19,40 @@
     \endlastfoot
 
     Sprint 0 & 1 semana & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
-        \item Configurar el entorno de trabajo.
-        \item Diseñar la arquitectura del middleware.
+        \item Configurar el entorno de desarrollo.
+        \item Diseñar la arquitectura del sistema.
         \item Diseñar la base de datos para gestión de usuarios, conexiones y consultas.
         \item Prototipar las interfaces de usuario del sistema.
-    \end{itemize} & T03, T07, T11, T15, T19, T23, T26, T30, T34, T40, T49, T54 \\
+    \end{itemize} & T05, T07, T12, T17, T21, T26, T30, T35, T47, T51, T55, T59 \\
     \hline
-    Sprint 1 & 3 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
-        \item Implementar el servicio de autenticación y gestión de cuentas.
-    \end{itemize} & T01, T02, T04, T05, T06, T08, T17, T18, T20 \\
+    Sprint 1 & 2 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
+        \item Implementar el registro e inicio de sesión.
+        \item Implementar la configuración de conexiones.
+    \end{itemize} & T01, T02, T03, T04, T06, T08, T23, T24, T25, T27 \\
     \hline
-    Sprint 2 & 3 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
-        \item Implementar el cambio y restablecimiento de contraseñas.
-        \item Implementar la configuración y gestión de conexiones.
-    \end{itemize} & T09, T10, T12, T13, T14, T16, T21, T22, T24, T25, T27, T28, T29, T31 \\
+    Sprint 2 & 2 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
+        \item Implementar la traducción de sentencias \texttt{SELECT} estándar.
+        \item Implementar la ejecución de consultas traducidas.
+    \end{itemize} & T32, T33, T34, T36, T43, T44, T45, T46, T48 \\
     \hline
-    Sprint 3 & 3 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
-        \item Implementar la generación de esquemas para bases de datos relacionales.
-        \item Implementar la traducción básica de consultas SQL a Cypher.
-    \end{itemize} & T32, T33, T35, T36, T37, T38, T39 \\
+    Sprint 3 & 2 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
+        \item Implementar la traducción de sentencias \texttt{SELECT} con cláusulas, funciones, operadores y relaciones.
+        \item Implementar la traducción de sentencias \texttt{INSERT INTO}, \texttt{UPDATE} y \texttt{DELETE}.
+    \end{itemize} & T37, T38, T39, T40, T41, T42 \\
     \hline
     Sprint 4 & 2 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
-        \item Implementar la traducción de consultas que incluyan relaciones, cláusulas, operadores y/o funciones.
-    \end{itemize} & T41, T42, T43, T44, T45, T46 \\
+        \item Implementar la modificación de perfil y restablecimiento de contraseña.
+        \item Implementar la gestión de usuarios y roles.
+    \end{itemize} & T09, T10, T11, T12, T14, T15, T16, T18, T19, T20, T22 \\
     \hline
     Sprint 5 & 2 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
+        \item Implementar la gestión de conexiones.
         \item Implementar el historial de consultas.
-        \item Implementar la ejecución de consultas traducidas.
-        \item Implementar la visualización y exportación de resultados.
-    \end{itemize} & T47, T48, T50, T51, T52, T53, T55 \\
+        \item Implementar la visualización de logs.
+    \end{itemize} & T28, T29, T31, T49, T50, T52, T53, T54, T56 \\
     \hline
     Sprint 6 & 2 semanas & \begin{itemize}[nosep, leftmargin=0.7cm, before=\vspace{0.5em}, after=\vspace{0.5em}]
-        \item Implementar el manejo de errores y retroalimentación.
-        \item Implementar la auditoría y monitoreo del \textit{middleware}.
-    \end{itemize} & T56, T57, T58, T59, T60, T61, T62, T63 \\
+        \item Implementar el monitoreo de estadísticas globales del \textit{middleware}.
+    \end{itemize} & T57, T58, T60 \\
     \hline  
 \end{longtable}

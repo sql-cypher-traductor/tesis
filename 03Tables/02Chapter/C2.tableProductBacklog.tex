@@ -1,4 +1,4 @@
-\begin{longtable}[c]{|c|c|m{0.32\textwidth}|c|c|}
+\begin{longtable}[c]{|c|c|m{0.39\textwidth}|c|c|}
     \caption{Product backlog del proyecto.}
     \label{tab:productBacklog} \\
     \hline
@@ -18,150 +18,142 @@
     
     \endlastfoot
     
-    \multirow{5}{*}{AUM-01} & T01 & Desarrollar la lógica para registrar nuevos usuarios. & 1 & 2 \\
+
+    \multirow{8}{*}{AUM-01} & T01 & Implementar funcionalidad de registro de usuario. & 1 & 2 \\
     \cline{2-5}
-     & T02 & Implementar un endpoint para registro de usuarios. & 1 & 3 \\
+     & T02 & Implementar funcionalidad para inicio de sesión. & 1 & 5 \\
     \cline{2-5}
-     & T03 & Diseñar el formulario de registro. & 1 & 2 \\
+     & T03 & Implementar validación de campos y credenciales para autenticación. & 1 & 3 \\
     \cline{2-5}
-     & T04 & Implementar la pantalla de registro de usuarios. & 1 & 3 \\
+     & T04 & Implementar endpoints para registro e inicio de sesión. & 1 & 3 \\
+    \cline{2-5}
+     & T05 & Diseñar pantalla de registro de usuario. & 2 & 2 \\
+    \cline{2-5}
+     & T06 & Desarrollar la pantalla de registro de usuario. & 1 & 3 \\
+    \cline{2-5}
+     & T07 & Diseñar pantalla de inicio de sesión. & 2 & 1 \\
+    \cline{2-5}
+     & T08 & Desarrollar la pantalla de inicio de sesión. & 1 & 2 \\
     \hline
     
-    \multirow{4}{*}{AUM-02} & T05 & Implementar generación y almacenamiento de JWT. & 1 & 5 \\
+    \multirow{4}{*}{AUM-02} & T09 & Implementar funcionalidad para actualización de perfil. & 1 & 3 \\
     \cline{2-5}
-     & T06 & Implementar un endpoint para inicio de sesión. & 1 & 3 \\
+     & T10 & Implementar validación de campos modificados. & 1 & 1 \\
     \cline{2-5}
-     & T07 & Diseñar el formulario de login. & 1 & 1 \\
+     & T11 & Implementar un endpoint para actualizar información. & 1 & 2 \\
     \cline{2-5}
-     & T08 & Implementar la pantalla de login. & 1 & 2 \\
+     & T12 & Diseñar pantalla de actualización de perfil. & 2 & 1 \\
+    \cline{2-5}
+     & T13 & Desarrollar pantalla de actualización de datos. & 1 & 2 \\
     \hline
     
-    \multirow{4}{*}{AUM-03} & T09 & Desarrollar la lógica de validación para la nueva contraseña. & 1 & 1 \\
+    \multirow{5}{*}{AUM-03} & T14 & Implementar funcionalidad de restablecimiento de contraseña. & 1 & 3 \\
     \cline{2-5}
-     & T10 & Implementar un endpoint para el cambio de contraseña. & 1 & 2 \\
+     & T15 & Implementar validación de formato para nueva contraseña. & 1 & 2 \\
     \cline{2-5}
-     & T11 & Diseñar el formulario de cambio de contraseña. & 2 & 1 \\
+     & T16 & Implementar validación de formato para nueva contraseña. & 1 & 2 \\
     \cline{2-5}
-     & T12 & Implementar el modal de cambio de contraseña. & 1 & 2 \\
+     & T17 & Diseñar los formularios para solicitar correo y restablecer contraseña. & 2 & 1 \\
+    \cline{2-5}
+     & T18 & Desarrollar los formularios para solicitud de correo y restablecimiento de contraseña. & 1 & 3 \\
     \hline
     
-    \multirow{4}{*}{AUM-04} & T13 & Desarrollar la lógica de restablecimiento con tokens de recuperación. & 2 & 2 \\
+    \multirow{4}{*}{AUM-04} & T19 & Implementar la funcionalidad para gestión de usuarios. & 1 & 5 \\
     \cline{2-5}
-     & T14 & Implementar endpoints para el restablecimiento de contraseñas. & 2 & 3 \\
+     & T20 & Implementar los endpoints correspondientes para administración de usuarios. & 1 & 8 \\
     \cline{2-5}
-     & T15 & Diseñar página de restablecer contraseña. & 2 & 1 \\
+     & T21 & Diseñar la pantalla de gestión de usuarios. & 1 & 3 \\
     \cline{2-5}
-     & T16 & Implementar pantalla para restablecer la contraseña. & 2 & 3 \\
-    \hline
-    
-    \multirow{4}{*}{AUM-05} & T17 & Desarrollar la lógica de administración de usuarios. & 1 & 5 \\
-    \cline{2-5}
-     & T18 & Implementar los endpoints para la gestión de usuarios (CRUD de usuarios). & 1 & 8 \\
-    \cline{2-5}
-     & T19 & Diseñar la vista de gestión de usuarios. & 1 & 3 \\
-    \cline{2-5}
-     & T20 & Implementar pantalla de gestión de usuarios. & 1 & 5 \\
+     & T22 & Desarrollar la pantalla de gestión de usuarios. & 1 & 5 \\
     \hline
 
 
-    \multirow{4}{*}{CON-01} & T21 & Desarrollar la lógica de conexión a SQL Server. & 1 & 2 \\
+    \multirow{5}{*}{CON-01} & T23 & Implementar la funcionalidad para configurar las conexiones a las bases de datos. & 1 & 3 \\
     \cline{2-5}
-     & T22 & Implementar una prueba de conexión a SQL Server. & 1 & 5 \\
+     & T24 & Implementar las pruebas de conectividad y las funciones de conexión y desconexión. & 1 & 8 \\
     \cline{2-5}
-     & T23 & Diseñar el formulario de conexión a SQL Server. & 1 & 2 \\
+     & T25 & Implementar un endpoint para el almacenamiento de una conexión. & 1 & 3 \\
     \cline{2-5}
-     & T24 & Implementar el formulario de conexión a SQL Server. & 1 & 3 \\
+     & T26 & Diseñar el modal para configurar una conexión. & 2 & 2 \\
+    \cline{2-5}
+     & T27 & Desarrollar el modal para configurar la conexión. & 1 & 3 \\
     \hline
     
-    \multirow{3}{*}{CON-02} & T25 & Implementar prueba de conexión a Neo4j. & 1 & 3 \\
+    \multirow{4}{*}{CON-02} & T28 & Implementar la funcionalidad para administración de conexiones. & 1 & 5 \\
     \cline{2-5}
-     & T26 & Diseñar el formulario de conexión a Neo4j. & 1 & 2 \\
+     & T29 & Implementar endpoints para la gestión de conexiones. & 1 & 5 \\
     \cline{2-5}
-     & T27 & Implementar el formulario de conexión a Neo4j. & 1 & 3 \\
-    \hline
-    
-    \multirow{4}{*}{CON-03} & T28 & Desarrollar las funcionalidades de gestión de conexiones (CRUD de conexiones). & 1 & 5 \\
+     & T30 & Diseñar la pantalla de gestión de conexiones. & 2 & 2 \\
     \cline{2-5}
-     & T29 & Implementar los endpoints para la gestión de conexiones. & 1 & 5 \\
-    \cline{2-5}
-     & T30 & Diseñar pantalla para gestión de conexiones. & 1 & 3 \\
-    \cline{2-5}
-     & T31 & Implementar pantalla de gestión de conexiones. & 1 & 3 \\
-    \hline
-    
-    \multirow{4}{*}{CON-04} & T32 & Desarrollar la estructura para generación de esquemas. & 1 & 3 \\
-    \cline{2-5}
-     & T33 & Implementar un endpoint para obtener el esquema de la base de datos relacional. & 1 & 3 \\
-    \cline{2-5}
-     & T34 & Diseñar la vista de esquemas de la base de datos. & 1 & 5 \\
-    \cline{2-5}
-     & T35 & Implementar el componente para visualizar esquemas. & 1 & 5 \\
+     & T31 & Desarrollar la pantalla para administrar conexiones. & 1 & 3 \\
     \hline
     
 
-    \multirow{6}{*}{QTE-01} & T36 & Definir gramática SQL básica para generación del parser y lexer. & 1 & 8 \\
+    \multirow{5}{*}{QTE-01} & T32 & Definir reglas léxicas y sintácticas de sentencias SELECT, las cláusulas WHERE, ORDER BY, palabras reservadas como FROM, DISTINCT, LIMIT, operadores lógicos y de comparación. & 1 & 8 \\
     \cline{2-5}
-     & T37 & Diseñar e implementar el árbol de sintaxis abstracto (AST). & 1 & 8 \\
+     & T33 & Implementar la funcionalidad de traducción de consultas SELECT. & 1 & 8 \\
     \cline{2-5}
-     & T38 & Implementar traductor de AST a Cypher y mapeo de tablas a etiquetas. & 1 & 8 \\
+     & T34 & Implementar un endpoint para la traducción de consultas. & 1 & 3 \\
     \cline{2-5}
-     & T39 & Implementar un endpoint para la traducción de consultas. & 1 & 3 \\
+     & T35 & Diseñar de la pantalla de traducción. & 1 & 3 \\
     \cline{2-5}
-     & T40 & Diseñar la vista de traducción. & 1 & 3 \\
-    \cline{2-5}
-     & T41 & Implementar la pantalla de traducción de consultas. & 1 & 3 \\
+     & T36 & Desarrollar la pantalla para traducción de consultas. & 1 & 5 \\
     \hline
     
-    \multirow{2}{*}{QTE-02} & T42 & Extender gramática con cláusulas, operadores y funciones. & 1 & 5 \\
+    \multirow{2}{*}{QTE-02} & T37 & Extender la gramática para funciones de agregación como COUNT, SUM, MIN, MAX o AVG, cláusulas ORDER BY, HAVING y palabras reservadas como AS. & 1 & 8 \\
     \cline{2-5}
-     & T43 & Implementar traducción de las cláusulas, operadores y funciones. & 1 & 5 \\
+     & T38 & Implementar la funcionalidad de traducción con agrupaciones y funciones de agregación. & 1 & 8 \\
     \hline
     
-    \multirow{3}{*}{QTE-03} & T44 & Extender gramática con JOINs. & 1 & 5 \\
+    \multirow{2}{*}{QTE-03} & T39 & Extender gramática para cláusulas INNER JOIN, LEFT JOIN y RIGHT JOIN y la palabra reservada ON. & 1 & 8 \\
     \cline{2-5}
-     & T45 & Implementar detección y mapeo de claves foráneas. & 1 & 5 \\
-    \cline{2-5}
-     & T46 & Implementar traducción de JOINs. & 1 & 8 \\
+     & T40 & Implementar la funcionalidad de traducción de consultas SELECT que incluyan relaciones. & 1 & 8 \\
     \hline
     
-    \multirow{4}{*}{QTE-04} & T47 & Desarrollar la lógica para la gestión del historial de consultas. & 1 & 3 \\
+    \multirow{2}{*}{QTE-04} & T41 & Agregar reglas para sentencias INSERT INTO, UPDATE y DELETE. & 1 & 5 \\
     \cline{2-5}
-     & T48 & Implementar endpoints para la visualización de consultas traducidas y/o ejecutadas. & 1 & 2 \\
-    \cline{2-5}
-     & T49 & Diseñar la vista del historial. & 1 & 2 \\
-    \cline{2-5}
-     & T50 & Desarrollar la pantalla de historial de consultas. & 1 & 3 \\
+     & T42 & Implementar funcionalidad para la traducción de INSERT INTO, UPDATE y DELETE. & 1 & 5 \\
     \hline
     
-    \multirow{2}{*}{QTE-05} & T51 & Desarrollar la lógica de ejecución de consultas. & 1 & 2 \\
+    \multirow{6}{*}{QTE-05} & T43 & Implementar funcionalidad para la ejecución de consultas. & 1 & 2 \\
     \cline{2-5}
-     & T52 & Implementar un endpoint para la ejecución de consultas traducidas en la base de datos de grafos. & 1 & 5 \\
-    \hline
-    
-    \multirow{3}{*}{QTE-06} & T53 & Implementar la lógica para el formato y exportación de resultados. & 1 & 5 \\
+     & T44 & Implementar la funcionalidad para visualización y formateo de resultados. & 1 & 5 \\
     \cline{2-5}
-     & T54 & Diseñar el panel de visualización de resultados. & 1 & 5 \\
+     & T45 & Implementar la funcionalidad para exportación de resultados en varios formatos. & 2 & 5 \\
     \cline{2-5}
-     & T55 & Desarrollar el panel de visualización y opciones de exportación de resultados. & 1 & 8 \\
+     & T46 & Implementar endpoints para la ejecución de consultas y exportación de resultados. & 1 & 5 \\
+    \cline{2-5}
+     & T47 & Diseñar el panel de resultados de la ejecución. & 2 & 5 \\
+    \cline{2-5}
+     & T48 & Desarrollar el panel para visualización de resultados. & 1 & 8 \\
     \hline
 
-    \multirow{2}{*}{OBS-01} & T56 & Desarrollar la lógica para el manejo y clasificación de errores. & 1 & 3 \\
+    \multirow{4}{*}{QTE-06} & T49 & Implementar la funcionalidad para gestión de consultas almacenadas. & 1 & 3 \\
     \cline{2-5}
-     & T57 & Implementar el componente de alerta de errores. & 1 & 2 \\
+     & T50 & Implementar los endpoints para la administración de consultas. & 1 & 2 \\
+    \cline{2-5}
+     & T51 & Diseñar la pantalla de historial de consultas. & 2 & 2 \\
+    \cline{2-5}
+     & T52 & Desarrollar la pantalla de historial de consultas. & 1 & 3 \\
     \hline
     
-    \multirow{3}{*}{OBS-02} & T58 & Implementar un logger de acciones del middleware. & 2 & 3 \\
-    \cline{2-5}
-     & T59 & Construir un endpoint para el manejo de logs. & 2 & 2 \\
-    \cline{2-5}
-     & T60 & Implementar una pantalla para visualización de logs. & 2 & 5 \\
-    \hline
     
-    \multirow{3}{*}{OBS-03} & T61 & Establecer e implementar la funcionalidad de estadísticas de uso. & 3 & 3 \\
+    \multirow{4}{*}{OBS-01} & T53 & Implementar la funcionalidad para almacenamiento de logs. & 2 & 5 \\
     \cline{2-5}
-     & T62 & Desarrollar un endpoint para obtener estadísticas generales. & 3 & 1 \\
+     & T54 & Implementar un endpoint para la obtención de logs. & 2 & 2 \\
     \cline{2-5}
-     & T63 & Construir un panel para visualización de estadísticas de uso. & 3 & 2 \\
+     & T55 & Diseñar pantalla para visualización de logs. & 3 & 3 \\
+    \cline{2-5}
+     & T56 & Desarrollar pantalla para visualización de logs. & 2 & 5 \\
+    \hline   
+    
+    \multirow{4}{*}{OBS-02} & T57 & Implementar la funcionalidad para la obtención de estadísticas generales de uso del sistema. & 3 & 5 \\
+    \cline{2-5}
+     & T58 & Implementar un endpoint para la visualización de estadísticas globales del sistema. & 3 & 3 \\
+    \cline{2-5}
+     & T59 & Diseñar el dashboard de estadísticas generales. & 3 & 3 \\
+    \cline{2-5}
+     & T60 & Desarrollar el dashboard para la visualización de estadísticas generales. & 3 & 8 \\
     \hline
     
 \end{longtable}
