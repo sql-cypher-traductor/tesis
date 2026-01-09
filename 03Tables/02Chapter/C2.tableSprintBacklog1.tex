@@ -1,29 +1,42 @@
-\begin{table}[H]
-    \centering
+\begin{longtable}[c]{|c|m{0.8\textwidth}|}
     \caption{Sprint 1 Backlog.}
-    \label{tab:sprintBacklog1}
-    \begin{tabular}{|c|m{0.8\textwidth}|}
+    \label{tab:sprintBacklog1} \\
+    
     \hline
     \rowcolor{gray!50}
-    \textbf{Código} & \multicolumn{1}{|c|}{\textbf{Tarea}} \\
+    \multicolumn{1}{|c|}{\textbf{Código}} & \multicolumn{1}{c|}{\textbf{Tarea}} \\
     \hline
-    T01 & Desarrollar la lógica para registrar nuevos usuarios. \\
+    \endfirsthead
+
     \hline
-    T02 & Implementar un endpoint para registro de usuarios. \\
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{Código}} & \multicolumn{1}{c|}{\textbf{Tarea}} \\
     \hline
-    T04 & Implementar la pantalla de registro de usuarios. \\
+    \endhead
+
+    \multicolumn{2}{r}{\textit{Continúa en la siguiente página...}} \\
+    \endfoot
+    
+    \endlastfoot
+
+    T01 & Implementar funcionalidad para registro de usuario. \\
     \hline
-    T05 & Implementar generación y almacenamiento de JWT. \\
+    T02 & Implementar funcionalidad para inicio de sesión. \\
     \hline
-    T06 & Implementar un endpoint para inicio de sesión. \\
+    T03 & Implementar validación de campos y credenciales para autenticación. \\
     \hline
-    T08 & Implementar la pantalla de login. \\
+    T04 & Implementar endpoints para registro e inicio de sesión. \\
     \hline
-    T17 & Desarrollar la lógica de administración de usuarios. \\
+    T06 & Desarrollar pantalla de registro de usuario. \\
     \hline
-    T18 & Implementar los endpoints para la gestión de usuarios (CRUD de usuarios). \\
+    T08 & Desarrollar pantalla de inicio de sesión. \\
     \hline
-    T20 & Implementar pantalla de gestión de usuarios. \\
+    T23 & Implementar funcionalidad para configurar las conexiones a las bases de datos. \\
     \hline
-    \end{tabular}
-\end{table}
+    T24 & Implementar pruebas de conectividad y funciones de conexión y desconexión. \\
+    \hline
+    T25 & Implementar un endpoint para el almacenamiento de una conexión. \\
+    \hline
+    T27 & Desarrollar modal para configurar una conexión. \\
+    \hline
+\end{longtable}

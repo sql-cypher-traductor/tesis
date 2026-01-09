@@ -55,28 +55,70 @@ A continuación, en la Tabla \ref{tab:sprintBacklog0} se puede visualizar la lis
 
 \subsubsection{Ejecución del Sprint 0}
 En la ejecución de este sprint se llevaron a cabo las siguientes actividades clave:
-\paragraph{Diseño de la arquitectura}
-La arquitectura del sistema 
+\paragraph{Definición de la arquitectura}
+La arquitectura de este middleware fue diseñada utilizando el modelo C4, un enfoque que permite representar la estructura del sistema a través de varios niveles de abstracción.
 
-Durante la ejecución de este Sprint, el equipo se centró en establecer los cimientos del proyecto. Las actividades principales se dividieron en el diseño de la experiencia de usuario y la configuración técnica inicial.
+\subparagraph{Diagrama de Contexto:}
+La Figura \ref{fig:diagramaContexto} ilustra el primer nivel del modelo C4 donde se identifica la interacción con los usuarios y sistemas externos. Aquí se aprecian dos tipos de usuarios principales: el administrador del sistema, encargado de gestionar usuarios, supervisar el correcto uso de la aplicación, identificar mejoras en ella y, desarrolladores, principales interesados en utilizar las funciones de traducción y ejecución de consultas.
+ 
+Por otro lado, se establecieron 3 sistemas externos dado que el middleware se conectará a los Sistemas Gestores de Bases de Datos SQL Server y Neo4j para acceder y manipular las bases de datos respectivas y un sistema que brinde el servicio de correo electrónico, necesario para el restablecimiento de contraseñas.
 
-En primer lugar, se abordó el diseño de las interfaces de usuario, asegurando que la interacción con el \textit{middleware} fuera intuitiva y eficiente. Se diseñaron las pantallas clave para la traducción de sentencias (T1.3), la visualización de errores (T3.1), el formulario de conexión a la base de datos (T4.3), la presentación de resultados de ejecución (T5.3) y el historial de consultas (T6.3). Estos diseños sirvieron como guía visual para el desarrollo del frontend en los sprints subsiguientes.
+\subparagraph{Diagrama de Contenedores:}
+En el diagrama de contenedores de la Figura \ref{fig:diagramaContenedores} se identifican los servicios que componen el sistema, la interacción entre ellos  las tecnologías requeridas para su implementación. Dentro de los contenedores definidos se contempló la interfaz de usuario con la cual los usuarios interactuarán directamente, la api que contendrá la lógica de negocio, un motor de traducción que se encargará del mapeo de sentencias SQL a Cypher, un servicio de logs que registrará toda actividad ejecutada en el \textit{middleware} y la base de datos interna, dedicada al almacenamiento de la información de usuarios, conexiones y consultas.
 
-Paralelamente, se definió la arquitectura del sistema y se configuró el entorno de desarrollo. Esto incluyó la creación de los repositorios de código, la configuración de las herramientas de control de versiones y la preparación de la estructura base tanto para el \textit{backend} como para el \textit{frontend}, respetando el stack tecnológico seleccionado previamente.
+% Diagrama de contexto
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../02Figures/02Chapter/C2.ContextDiagram.png}
+    \caption{Diagrama de contexto del sistema.}
+    \label{fig:diagramaContexto}
+\end{figure}
 
-Adicionalmente, se estableció el entorno de pruebas para las futuras APIs. Se creó una colección compartida en \textbf{Postman}, definiendo las variables de entorno globales (como la URL base del servidor de desarrollo) y la estructura de carpetas para organizar las peticiones por módulos, lo que facilitaría las pruebas de integración en los siguientes sprints.
+% Diagrama de contenedores
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../02Figures/02Chapter/C2.ContainersDiagram.png}
+    \caption{Diagrama de contenedores del sistema.}
+    \label{fig:diagramaContenedores}
+\end{figure}
 
-% Se sugiere agregar aquí una figura con los prototipos de las interfaces diseñadas (ej. Figura X: Prototipos de UI del Sprint 0).
+\paragraph{Definición de la base de datos}
+% Redactar aquí
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../02Figures/02Chapter/C2.DBDiagram.jpg}
+    \caption{Diagrama de base de datos del sistema.}
+    \label{fig:diagramaBaseDatos}
+\end{figure}
+
+\paragraph{Diseño de los prototipos de interfaces}
+
+\paragraph{Configuración de herramientas de gestión del proyecto}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.ProjectManagement.png}
+    \caption{Configuración para gestión del proyecto con Trello.}
+    \label{fig:gestionProyectoTrello}
+\end{figure}
+
+
+\paragraph{Configuración del entorno de desarrollo}
+
 
 \subsubsection{Sprint 0 Review}
+% Redactar aquí
 Al finalizar el Sprint 0, se realizó la revisión con los interesados para validar los artefactos generados. Se presentaron los prototipos de alta fidelidad de las interfaces de usuario, obteniendo retroalimentación positiva sobre la disposición de los elementos y el flujo de navegación propuesto. Asimismo, se verificó la correcta configuración del entorno de desarrollo y la arquitectura base, confirmando que el equipo contaba con todas las herramientas necesarias para iniciar la codificación de las funcionalidades en el siguiente sprint.
 
 \subsubsection{Sprint 0 Retrospective}
+% Redactar aquí
 La retrospectiva del Sprint 0 permitió al equipo reflexionar sobre el inicio del proyecto.
 
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
+    % Redactar aquí
     La definición temprana de la arquitectura y el stack tecnológico permitió configurar el entorno sin contratiempos mayores. La comunicación fluida durante la fase de diseño facilitó la creación de prototipos que cumplían con las expectativas de los interesados.
     \item \textbf{¿Qué se puede mejorar?} \newline
+    % Redactar aquí
     Se identificó que la estimación de tiempo para algunas tareas de diseño fue ajustada, por lo que se acordó refinar los criterios de estimación para futuras tareas creativas. Además, se propuso documentar con mayor detalle las decisiones arquitectónicas a medida que se toman.
 \end{itemize}

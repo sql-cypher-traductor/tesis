@@ -1,25 +1,34 @@
-\begin{table}[H]
-    \centering
+\begin{longtable}[c]{|c|m{0.8\textwidth}|}
     \caption{Sprint 3 Backlog.}
-    \label{tab:sprintBacklog3}
-    \begin{tabular}{|c|m{0.8\textwidth}|}
+    \label{tab:sprintBacklog3} \\
+    
     \hline
     \rowcolor{gray!50}
-    \textbf{Código} & \multicolumn{1}{|c|}{\textbf{Tarea}} \\
+    \multicolumn{1}{|c|}{\textbf{Código}} & \multicolumn{1}{c|}{\textbf{Tarea}} \\
     \hline
-    T32 & Desarrollar la estructura para generación de esquemas. \\
+    \endfirsthead
+
     \hline
-    T33 & Implementar un endpoint para obtener el esquema de la base de datos relacional. \\
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{Código}} & \multicolumn{1}{c|}{\textbf{Tarea}} \\
     \hline
-    T35 & Implementar el componente para visualizar esquemas. \\
+    \endhead
+
+    \multicolumn{2}{r}{\textit{Continúa en la siguiente página...}} \\
+    \endfoot
+    
+    \endlastfoot
+
+    T37 & Extender gramática para funciones de agregación como COUNT, SUM, MIN, MAX o AVG, cláusulas ORDER BY, HAVING y palabras reservadas como AS. \\
     \hline
-    T36 & Definir gramática SQL básica para generación del parser y lexer. \\
+    T38 & Implementar funcionalidad para traducción con agrupaciones y funciones de agregación. \\
     \hline
-    T37 & Diseñar e implementar el árbol de sintaxis abstracto (AST). \\
+    T39 & Extender gramática para cláusulas INNER JOIN, LEFT JOIN y RIGHT JOIN y la palabra reservada ON. \\
     \hline
-    T38 & Implementar traductor de AST a Cypher y mapeo de tablas a etiquetas. \\
+    T40 & Implementar funcionalidad para traducción de consultas SELECT que incluyan relaciones. \\
     \hline
-    T39 & Implementar un endpoint para la traducción de consultas. \\
+    T41 & Extender gramática para sentencias INSERT INTO, UPDATE y DELETE. \\
     \hline
-    \end{tabular}
-\end{table}
+    T42 & Implementar funcionalidad para la traducción de INSERT INTO, UPDATE y DELETE. \\
+    \hline
+\end{longtable}
