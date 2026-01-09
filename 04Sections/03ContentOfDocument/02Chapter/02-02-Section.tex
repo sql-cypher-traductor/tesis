@@ -66,7 +66,6 @@ Por otro lado, se establecieron 3 sistemas externos dado que el middleware se co
 \subparagraph{Diagrama de Contenedores:}
 En el diagrama de contenedores de la Figura \ref{fig:diagramaContenedores} se identifican los servicios que componen el sistema, la interacción entre ellos  las tecnologías requeridas para su implementación. Dentro de los contenedores definidos se contempló la interfaz de usuario con la cual los usuarios interactuarán directamente, la api que contendrá la lógica de negocio, un motor de traducción que se encargará del mapeo de sentencias SQL a Cypher, un servicio de logs que registrará toda actividad ejecutada en el \textit{middleware} y la base de datos interna, dedicada al almacenamiento de la información de usuarios, conexiones y consultas.
 
-% Diagrama de contexto
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{../02Figures/02Chapter/C2.ContextDiagram.png}
@@ -74,27 +73,59 @@ En el diagrama de contenedores de la Figura \ref{fig:diagramaContenedores} se id
     \label{fig:diagramaContexto}
 \end{figure}
 
-% Diagrama de contenedores
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{../02Figures/02Chapter/C2.ContainersDiagram.png}
+    \includegraphics[width=0.9\linewidth]{../02Figures/02Chapter/C2.ContainersDiagram.png}
     \caption{Diagrama de contenedores del sistema.}
     \label{fig:diagramaContenedores}
 \end{figure}
 
 \paragraph{Definición de la base de datos}
-% Redactar aquí
+De acuerdo a las Historias de Usuario definidas, se optó por implementar una base de datos relacional que contenga la información de los usuarios, la configuración de sus conexiones, las consultas realizadas y para poder dar seguimiento a cada una de las acciones que ejecuten sobre la aplicación. Esta base de datos que será implementada en PostgreSQL contiene 4 tablas principales: \textbf{USUARIOS}, \textbf{CONEXIONES}, \textbf{CONSULTAS} y \textbf{LOGS}, mismas que serán guias para garantizar la integridad de los datos. La Figura \ref{fig:diagramaBaseDatos} ilustra el diagrama de base de datos propuesto con las tablas mencionadas, los campos que contendrán y las relaciones entre ellas.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{../02Figures/02Chapter/C2.DBDiagram.jpg}
-    \caption{Diagrama de base de datos del sistema.}
+    \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.DBDiagram.jpg}
+    \caption{Diagrama de base de datos propuesta.}
     \label{fig:diagramaBaseDatos}
 \end{figure}
 
 \paragraph{Diseño de los prototipos de interfaces}
+Se realizaron prototipos de alta a través de Figma tal y como se puede observar en la Figura \ref{fig:prototipoFigma}. Las pantallas diseñadas y que se encuentran en el Anexo \ref{Annexes:AnexoII} son las siguientes:
+\begin{itemize}
+    \item Pantallas para desarrolladores y administradores
+    \begin{itemize}
+        \item Inicio de sesión
+        \item Registro de usuario
+        \item Dashboard principal
+        \item Editar perfil
+        \item Restablecimiento de contraseña
+        \item Configurar conexión
+        \item Gestión de conexiones
+        \item Traducción y ejecución de consultas
+        \item Historial de consultas
+    \end{itemize}
+    \item Pantallas solo para administradores
+    \begin{itemize}
+        \item Gestión de usuarios
+        \item Logs del sistema
+        \item Estadísticas del sistema
+    \end{itemize}
+\end{itemize}
+
+% Poner el prototipo correcto
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.ProjectManagement.png}
+    \caption{Configuración para gestión del proyecto con Trello.}
+    \label{fig:prototipoFigma}
+\end{figure}
 
 \paragraph{Configuración de herramientas de gestión del proyecto}
+Por su parte para llevar una correcta gestión del proyecto y tomando en cuenta que se está utilizando Scrum, se optó por la herramienta Trello por su fácil integración hacia otros sistemas como GitHub. La Figura \ref{fig:gestionProyectoTrello} muestra cómo fue configurado el proyecto mediante Trello, donde se pueden ver cada una de las fases para que cada HU pueda ser completada exitosamente.
+
+% Mejorar redacción
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.ProjectManagement.png}
@@ -104,7 +135,6 @@ En el diagrama de contenedores de la Figura \ref{fig:diagramaContenedores} se id
 
 
 \paragraph{Configuración del entorno de desarrollo}
-
 
 \subsubsection{Sprint 0 Review}
 % Redactar aquí
