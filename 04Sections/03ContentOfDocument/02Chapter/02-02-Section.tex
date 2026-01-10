@@ -55,7 +55,7 @@ A continuación, en la Tabla \ref{tab:sprintBacklog0} se puede visualizar la lis
 
 \subsubsection{Ejecución del Sprint 0}
 En la ejecución de este sprint se llevaron a cabo las siguientes actividades clave:
-\paragraph{Definición de la arquitectura}
+\paragraph{Definición de arquitectura}
 La arquitectura de este middleware fue diseñada utilizando el modelo C4, un enfoque que permite representar la estructura del sistema a través de varios niveles de abstracción.
 
 \subparagraph{Diagrama de Contexto:}
@@ -80,7 +80,7 @@ En el diagrama de contenedores de la Figura \ref{fig:diagramaContenedores} se id
     \label{fig:diagramaContenedores}
 \end{figure}
 
-\paragraph{Definición de la base de datos}
+\paragraph{Definición de base de datos}
 De acuerdo a las Historias de Usuario definidas, se optó por implementar una base de datos relacional que contenga la información de los usuarios, la configuración de sus conexiones, las consultas realizadas y para poder dar seguimiento a cada una de las acciones que ejecuten sobre la aplicación. Esta base de datos que será implementada en PostgreSQL contiene 4 tablas principales: \textbf{USUARIOS}, \textbf{CONEXIONES}, \textbf{CONSULTAS} y \textbf{LOGS}, mismas que serán guias para garantizar la integridad de los datos. La Figura \ref{fig:diagramaBaseDatos} ilustra el diagrama de base de datos propuesto con las tablas mencionadas, los campos que contendrán y las relaciones entre ellas.
 
 \begin{figure}[H]
@@ -90,7 +90,7 @@ De acuerdo a las Historias de Usuario definidas, se optó por implementar una ba
     \label{fig:diagramaBaseDatos}
 \end{figure}
 
-\paragraph{Diseño de los prototipos de interfaces}
+\paragraph{Diseño de prototipos de interfaces}
 Se realizaron prototipos de alta a través de Figma tal y como se puede observar en la Figura \ref{fig:prototipoFigma}. Las pantallas diseñadas y que se encuentran en el Anexo \ref{Annexes:AnexoII} son las siguientes:
 \begin{itemize}
     \item Pantallas para desarrolladores y administradores
@@ -116,39 +116,45 @@ Se realizaron prototipos de alta a través de Figma tal y como se puede observar
 % Poner el prototipo correcto
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.ProjectManagement.png}
-    \caption{Configuración para gestión del proyecto con Trello.}
+    \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.FigmaPrototype.png}
+    \caption{Prototipo de pantalla de traducción realizado en Figma.}
     \label{fig:prototipoFigma}
 \end{figure}
 
 \paragraph{Configuración de herramientas de gestión del proyecto}
-Por su parte para llevar una correcta gestión del proyecto y tomando en cuenta que se está utilizando Scrum, se optó por la herramienta Trello por su fácil integración hacia otros sistemas como GitHub. La Figura \ref{fig:gestionProyectoTrello} muestra cómo fue configurado el proyecto mediante Trello, donde se pueden ver cada una de las fases para que cada HU pueda ser completada exitosamente.
-
-% Mejorar redacción
+Para supervisar un continuo progreso en el desarrollo del proyecto, se optó por 2 herramientas principales: Trello que se empleará para asignar las tareas establecidas al planificar los Sprints y conocer el estado de cada una dentro de su iteración. En la Figura \ref{fig:gestionProyectoTrello} se puede observar la configuración para gestionar el proyecto, donde se crearon las columnas: Epics, Product Backlog, Sprint Backlog, In Progress, Code Review y Done. Las 3 primeras columnas servirán para identificar las Épicas e Historias de Usuario mencionadas en secciones anteriores y indicar cuáles se deberán completar en un determinado sprint. El resto de columnas indicarán el avance de cada Historia de Usuario.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.ProjectManagement.png}
-    \caption{Configuración para gestión del proyecto con Trello.}
+    \caption{Configuración inicial del proyecto en Trello.}
     \label{fig:gestionProyectoTrello}
 \end{figure}
 
+Para facilitar la comunicación entre todo el equipo de Scrum, se creó un canal en la plataforma Microsoft Teams donde se llevarán a cabo reuniones para revisar avances, discutir sobre los obstáculos que surjan a lo largo del proyecto y obtener constante retroalimentación por parte del director de tesis.
+
 
 \paragraph{Configuración del entorno de desarrollo}
+Se creó una organización en GitHub que alberga 3 repositorios destinados para el backend, frontend y la documentación del sistema. Esto se puede observar en la Figura \ref{fig:distribucionRepositorios}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{../02Figures/02Chapter/C2.RepositoriesDistribution.png}
+    \caption{Distribución de repositorios en GitHub.}
+    \label{fig:distribucionRepositorios}
+\end{figure}
+
+Para el desarrollo del frontend y backend se estableció un flujo de trabajo con 2 ramas principales: \texttt{main} que tendrá el código funcional y \texttt{develop} que será utilizada como una rama de integración donde se implementarán, testearán, corregirán e integrarán las funcionalidades del \textit{middleware}.
+
 
 \subsubsection{Sprint 0 Review}
-% Redactar aquí
-Al finalizar el Sprint 0, se realizó la revisión con los interesados para validar los artefactos generados. Se presentaron los prototipos de alta fidelidad de las interfaces de usuario, obteniendo retroalimentación positiva sobre la disposición de los elementos y el flujo de navegación propuesto. Asimismo, se verificó la correcta configuración del entorno de desarrollo y la arquitectura base, confirmando que el equipo contaba con todas las herramientas necesarias para iniciar la codificación de las funcionalidades en el siguiente sprint.
+Durante este sprint se completaron con todas las tareas que fueron incluidas en el backlog, además de diseñar la arquitectura del sistema, la base de datos interno y la configuración de las plataformas para gestión del proyecto e implementación de código. Al cumplir con todas las actividades antes mencionadas, se iniciará con el desarrollo de código del sistema a partir del Sprint 1.
 
 \subsubsection{Sprint 0 Retrospective}
-% Redactar aquí
-La retrospectiva del Sprint 0 permitió al equipo reflexionar sobre el inicio del proyecto.
-
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    % Redactar aquí
-    La definición temprana de la arquitectura y el stack tecnológico permitió configurar el entorno sin contratiempos mayores. La comunicación fluida durante la fase de diseño facilitó la creación de prototipos que cumplían con las expectativas de los interesados.
+    El diseño de la arquitectura del sistema, las bases de datos y los prototipos de interfaces de usuario en conjunto con el stack tecnológico brindó una orientación para estructurar los repositorios y que puedan ser escalables y mantenibles.
+
     \item \textbf{¿Qué se puede mejorar?} \newline
-    % Redactar aquí
-    Se identificó que la estimación de tiempo para algunas tareas de diseño fue ajustada, por lo que se acordó refinar los criterios de estimación para futuras tareas creativas. Además, se propuso documentar con mayor detalle las decisiones arquitectónicas a medida que se toman.
+    La falta de conocimiento en el uso de Trello retrasó a la configuración inicial de la herramienta que brinda una variedad de herramientas que optimicen la gestión de proyectos y la integración con GitHub. Se propone una capacitación de esta plataforma para sacar provecho de esta aplicación y aumentar la productividad del equipo.
 \end{itemize}
