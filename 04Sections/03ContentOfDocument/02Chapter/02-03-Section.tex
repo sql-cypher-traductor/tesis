@@ -2,18 +2,18 @@ En esta fase se detalla todo el desarrollo del \textit{middleware} para traducir
 
 \subsection{Sprint 1}
 \subsubsection{Sprint 1 Planning}
-El objetivo principal del Sprint 1 fue implementar la funcionalidad principal del \textit{middleware}: la traducción básica de sentencias SQL a Cypher. Durante la planificación, se seleccionó la historia de usuario relacionada con el análisis sintáctico y la creación de la interfaz principal de traducción, priorizando la capacidad de procesar consultas simples antes de abordar estructuras más complejas.
+El objetivo principal del Sprint 1 fue implementar el servicio de autenticación y la conexión a los DBMS tanto de SQL Server como de Neo4j. Con esto se busca establecer las funciones de acceso al sistema y que el usuario sea capaz de configurar la conexión a las bases de datos con las cuales desea interactuar.
 
 \subsubsection{Sprint 1 Backlog}
-La Tabla \ref{tab:sprintBacklog1} detalla las tareas del Sprint 1.
+La Tabla \ref{tab:sprintBacklog1} detalla las tareas del Backlog para esta primera iteración, mismas que abordan las Historias de Usuario AUM-01 y CON-01.
 
 \input{../03Tables/02Chapter/C2.tableSprintBacklog1}
 
-
 \subsubsection{Ejecución del Sprint 1}
-La ejecución de este sprint se centró en el desarrollo del motor de traducción. Se implementó la lógica de parseo (T1.1) necesaria para identificar los componentes de una sentencia SQL básica (SELECT, FROM, WHERE) y mapearlos a sus equivalentes en Cypher (MATCH, RETURN, WHERE).
+Este apartado lo dividiremos en 2 partes: el desarrollo del servicio de autenticación y la implementación de la conexión a las DBMS.
 
-Simultáneamente, se desarrolló el endpoint en el backend (T1.2) que expone esta lógica de traducción. Se definió la ruta \texttt{POST /api/translate}, la cual recibe en el cuerpo de la petición un objeto JSON con la sentencia SQL y retorna la sentencia Cypher generada. En el frontend, se construyó la vista de traducción (T1.4), integrando el diseño aprobado en el Sprint 0. Esta interfaz consume el servicio mencionado, permitiendo al usuario ingresar código SQL y visualizar la traducción resultante en tiempo real.
+\paragraph{Servicio de Autenticación}
+\subparagraph{}
 
 \paragraph{Pruebas con Postman}
 Para validar la funcionalidad del endpoint de traducción, se realizaron pruebas exhaustivas utilizando Postman. Se configuraron casos de prueba para verificar:
