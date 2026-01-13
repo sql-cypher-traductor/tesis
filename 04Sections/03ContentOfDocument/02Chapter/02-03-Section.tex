@@ -13,32 +13,132 @@ La Tabla \ref{tab:sprintBacklog1} detalla las tareas del Backlog para esta prime
 Este apartado lo dividiremos en 2 partes: el desarrollo del servicio de autenticación y la implementación de la conexión a las DBMS.
 
 \paragraph{Servicio de Autenticación}
-\subparagraph{}
+Para el servicio de autenticación, se implementaron las funcionalidades de registro e inicio de sesión en este Sprint.
 
-\paragraph{Pruebas con Postman}
-Para validar la funcionalidad del endpoint de traducción, se realizaron pruebas exhaustivas utilizando Postman. Se configuraron casos de prueba para verificar:
-\begin{itemize}
-    \item \textbf{Traducción exitosa:} Envío de sentencias \texttt{SELECT} simples y verificación de que el código de estado HTTP sea 200 OK y el cuerpo de la respuesta contenga el Cypher esperado.
-    \item \textbf{Manejo de errores:} Envío de cuerpos de petición vacíos o con formato JSON inválido para asegurar que la API responda con códigos 400 Bad Request y mensajes de error descriptivos.
-\end{itemize}
+\subparagraph{Backend:}
 
-% Se sugiere agregar aquí una captura de Postman mostrando una petición al endpoint /api/translate y su respuesta.
+Se crearon los endpoints \texttt{/api/v1/auth/register} y \texttt{/api/v1/auth/login} para las funciones previamente mencionadas. El endpoint de registro maneja la creación de nuevos usuarios, validando que los correos electrónicos no se dupliquen para las distintas cuentas y asegurando el almacenamiento seguro de contraseñas mediante encriptación bcrypt. Por otra parte, el endpoint de inicio de sesión verifica las credenciales del usuario y, si son correctas, genera un token de acceso JWT que se utilizará para autenticar las solicitudes posteriores.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+# app/api/v1/endpoints/auth.py
+@router.post("/register", response_model=User)
+def register(*,
+    db: Session = Depends(deps.get_db),
+    user_in: UserCreate,
+) -> Any:
+    " Crear nuevo usuario. "
+    user = auth_service.get_user_by_email(db, email=user_in.email)
+    if user:
+        raise HTTPException(
+            status_code=400,
+            detail="El usuario con este correo ya existe en el sistema.",
+        )
+    user = auth_service.create_user(db, user_in=user_in)
+    return user
+    \end{lstlisting}
+    \caption{Endpoint de registro de usuario.}
+    \label{fig:sprint1_register_endpoint}
+\end{figure}
+
+\subparagraph{Frontend:}
+Aquí se construyeron las pantallas respectivas para registro y login. Se utilizó la librería Zod para validar los campos desde el lado del cliente asegurando que cumplan los formatos correctos previo a la integración con el backend. La gestión del estado de autenticación se maneja con Zustand, almacenando el token de acceso y la información del usuario de forma segura.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}
+// src/app/auth/login/page.tsx
+"use client";
+import { useAuthStore } from "@/store/useAuthStore";
+// ...
+
+export default function LoginPage() {
+  const { login, isLoading, error } = useAuthStore();
+  // ...
+  const onSubmit = async (values: LoginData) => {
+    await login(values);
+  };
+  // ...
+}
+    \end{lstlisting}
+    \caption{Componente de la página de inicio de sesión.}
+    \label{fig:sprint1_login_page}
+\end{figure}
+
+\paragraph{Conexión a las DBMS}
+Para la interacción del usuario con bases de datos a su elección, se implementó la funcionalidad de configuración de las conexiones tanto las bases de datos de SQL Server como Neo4j.
+
+\subparagraph{Backend:}
+El endpoint creado recibe los detalles de conexión como el nombre de la base de datos, las credenciales de acceso al DBMS o el tipo de base de datos donde se diferencia si esta es relacional u orientada a grafos, luego las valida y almacena en la base de datos asociándolo al usuario autenticado. También se implementó una función de prueba de conectividad previo a guardar la configuración.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+# app/api/v1/endpoints/connections.py
+@router.post("/", response_model=Connection)
+def create_connection(
+    *,
+    db: Session = Depends(deps.get_db),
+    connection_in: ConnectionCreate,
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Create new connection.
+    """
+    connection = connection_service.create_connection(
+        db=db, connection_in=connection_in, user_id=current_user.id
+    )
+    return connection
+    \end{lstlisting}
+    \caption{Endpoint para crear una conexión.}
+    \label{fig:sprint1_create_connection_endpoint}
+\end{figure}
+
+\subparagraph{Frontend:}
+Dentro del frontend, se implementó un modal en la interfaz de usuario donde los usuarios deben ingresar los detalles de la conexión (host, puerto, usuario, contraseña, etc.). Este modal está integrado directamente con la lógica de configuración de conexiones implementada en el backend y maneja una basta retroalimentación que indica al usuario de forma amigable si existen o no problemas de conexión.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}  
+// src/components/connections/ConnectionModal.tsx
+"use client";
+import { useConnectionStore } from "@/store/useConnectionStore";
+// ...
+
+export function ConnectionModal() {
+  const { createConnection, loading } = useConnectionStore();
+  // ...
+  const onSubmit = async (data: ConnectionFormData) => {
+    const success = await createConnection(data);
+    if (success) {
+      // ...
+    }
+  };
+  // ...
+}
+    \end{lstlisting}
+    \caption{Componente del modal de conexión.}
+    \label{fig:sprint1_connection_modal}
+\end{figure}
 
 \subsubsection{Sprint 1 Review}
-En la revisión del sprint, se demostró la funcionalidad de traducción con sentencias SQL simples. Se verificó que el sistema recibiera una consulta SQL válida, la procesara correctamente en el backend y devolviera la sentencia Cypher correspondiente en la interfaz de usuario. Los interesados validaron que la sintaxis generada fuera correcta para una base de datos Neo4j estándar.
+Al finalizar el Sprint 1, se completaron con éxito las tareas planificadas en el backlog. El sistema ahora cuenta con un servicio de autenticación funcional que permite a los usuarios registrarse e iniciar sesión de forma segura. Asimismo, la aplicación brinda la facilidad para configurar y almacenar las credenciales de sus bases de datos SQL Server y Neo4j. A través de las pruebas unitarias y de integración realizadas se asegura la calidad y estabilidad de la implementación en esta primera iteración.
 
 \subsubsection{Sprint 1 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La integración entre el frontend y el backend fue fluida gracias a la definición clara de los contratos de la API. El uso de bibliotecas de parseo facilitó la identificación de tokens SQL.
+    La implementación de los flujos de autenticación y conexión se realizó sin mayores contratiempos. La separación de responsabilidades entre el frontend y el backend, junto con el uso de FastAPI y Next.js, demostró ser una arquitectura robusta y escalable. La gestión de estado con Zustand en el frontend simplificó el manejo de la información del usuario y las conexiones.
+    
     \item \textbf{¿Qué se puede mejorar?} \newline
-    Se subestimó la complejidad de manejar ciertas variaciones sintácticas de SQL. Para el próximo sprint, se acordó realizar un análisis más detallado de los casos borde antes de comenzar la implementación.
+    Aunque la funcionalidad principal está implementada, se podría mejorar la experiencia de usuario añadiendo retroalimentación más detallada durante los procesos de conexión. Para el backend, se podría considerar la implementación de un sistema de refresco de tokens (refresh tokens) para mejorar la seguridad y la persistencia de la sesión del usuario. Además, sería beneficioso ampliar la cobertura de las pruebas para incluir más casos de borde.
+    
 \end{itemize}
 
 
 \subsection{Sprint 2}
 \subsubsection{Sprint 2 Planning}
-El Sprint 2 tuvo como meta extender la capacidad de traducción para soportar consultas relacionales complejas, específicamente aquellas que involucran uniones de tablas (JOINs). La planificación se enfocó en cómo interpretar las claves foráneas del modelo relacional y transformarlas en relaciones semánticas dentro del modelo de grafos.
+El objetivo de este sprint fue implementar la funcionalidad principal del traductor, permitiendo a los usuarios convertir sentencias \texttt{SELECT} estándar de SQL a su equivalente en Cypher. Adicionalmente, se buscó habilitar la ejecución de estas consultas traducidas en la base de datos Neo4j y visualizar los resultados obtenidos.
 
 \subsubsection{Sprint 2 Backlog}
 La Tabla \ref{tab:sprintBacklog2} detalla las tareas del Sprint 2.
@@ -47,34 +147,86 @@ La Tabla \ref{tab:sprintBacklog2} detalla las tareas del Sprint 2.
 
 
 \subsubsection{Ejecución del Sprint 2}
-Durante este periodo, el trabajo técnico fue de alta complejidad lógica. Se desarrolló el algoritmo para la detección de cláusulas JOIN y claves foráneas dentro de las sentencias SQL (T2.1). Este componente es crucial para entender cómo se relacionan las entidades en el esquema original.
+El trabajo de este sprint se centró en dos áreas principales: la traducción de sentencias \texttt{SELECT} y la ejecución y visualización de las consultas resultantes.
 
-Posteriormente, se actualizó el endpoint de traducción (\texttt{POST /api/translate}) para soportar estas nuevas estructuras. Se implementó el mapeo de claves foráneas a relaciones de grafos en Cypher (T2.2), traduciendo la estructura \texttt{TABLA\_A JOIN TABLA\_B ON A.id = B.a\_id} a un patrón de grafo \texttt{(a:TablaA)-[:RELACION]->(b:TablaB)}. Finalmente, se ajustó la visualización en el frontend (T2.3) para manejar y presentar adecuadamente estas consultas más extensas y complejas.
+\paragraph{Traducción de Consultas \texttt{SELECT}}
+\subparagraph{Backend:}
+Se utilizó ANTLR (Another Tool for Language Recognition) para construir el parser del dialecto SQL soportado. Se definieron las reglas léxicas y sintácticas en un archivo de gramática (\texttt{SQLSimple.g4}) para reconocer la estructura de una sentencia \texttt{SELECT}, incluyendo cláusulas como \texttt{WHERE} y \texttt{ORDER BY}, y palabras clave como \texttt{DISTINCT} y \texttt{LIMIT}.
 
-\paragraph{Pruebas con Postman}
-Las pruebas de integración se enfocaron en validar la capacidad del endpoint para procesar relaciones:
-\begin{itemize}
-    \item \textbf{Joins Implicitos y Explícitos:} Se enviaron peticiones con sentencias SQL conteniendo \texttt{INNER JOIN} y \texttt{LEFT JOIN}. Se verificó en la respuesta JSON que la cadena Cypher resultante incluyera la sintaxis de relaciones (flechas y etiquetas) correcta.
-    \item \textbf{Validación de Sintaxis:} Se probaron casos con sintaxis de JOIN incompleta para confirmar que el parser devolviera los errores de sintaxis adecuados antes de intentar la traducción.
-\end{itemize}
+A partir de esta gramática, se generaron las clases del lexer, parser y un visitor. Se implementó una clase \texttt{Visitor} personalizada que recorre el árbol sintáctico abstracto (AST) generado por el parser y construye la consulta Cypher equivalente. Finalmente, se expuso esta lógica a través de un endpoint \texttt{/translate}.
 
-% Se sugiere agregar aquí una tabla comparativa o imagen mostrando una sentencia SQL con JOIN y su traducción a Cypher.
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+# app/core/parser/visitor.py
+class Visitor(SQLSimpleVisitor):
+    def visitSelect_statement(self, ctx: SQLSimpleParser.Select_statementContext):
+        # ... Logica de traduccion ...
+        cypher_query = f"MATCH {match_clause} RETURN {return_clause}"
+        # ...
+        return cypher_query
+    \end{lstlisting}
+    \caption{Implementación del Visitor para la traducción.}
+    \label{fig:sprint2_visitor}
+\end{figure}
+
+\subparagraph{Frontend:}
+Se desarrolló la pantalla principal de traducción, que consta de dos editores de código: uno para ingresar la consulta SQL (\texttt{SQLEditor}) y otro para mostrar la consulta Cypher resultante (\texttt{CypherViewer}). Se utilizó la librería CodeMirror para crear estos editores, proporcionando resaltado de sintaxis y una mejor experiencia de usuario. La comunicación con el endpoint de traducción del backend se gestionó a través de un store de Zustand (\texttt{useTranslateStore}).
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}
+// src/app/dashboard/translate/page.tsx
+"use client";
+import { SQLEditor } from "@/components/translator/SQLEditor";
+import { CypherViewer } from "@/components/translator/CypherViewer";
+import { useTranslateStore } from "@/store/useTranslateStore";
+
+export default function TranslatePage() {
+  const { sqlQuery, setSqlQuery, translatedQuery, translateQuery, loading } =
+    useTranslateStore();
+
+  const handleTranslate = async () => {
+    await translateQuery(sqlQuery);
+  };
+
+  return (
+    // ...
+    <SQLEditor value={sqlQuery} onChange={setSqlQuery} />
+    <button onClick={handleTranslate}>Translate</button>
+    <CypherViewer value={translatedQuery} />
+    // ...
+  );
+}
+    \end{lstlisting}
+    \caption{Componente de la página de traducción.}
+    \label{fig:sprint2_translate_page}
+\end{figure}
+
+\paragraph{Ejecución y Visualización de Consultas}
+\subparagraph{Backend:}
+Se crearon los endpoints necesarios para ejecutar las consultas Cypher en la base de datos Neo4j configurada por el usuario y para exportar los resultados. El servicio de ejecución se conecta a Neo4j, ejecuta la consulta y devuelve los resultados en formato JSON.
+
+\subparagraph{Frontend:}
+Se implementó un panel de resultados que muestra los datos obtenidos de la ejecución de la consulta en una tabla. Este panel también incluye la funcionalidad para exportar los resultados en formatos como CSV y JSON, permitiendo al usuario trabajar con los datos fuera de la aplicación.
 
 \subsubsection{Sprint 2 Review}
-La revisión consistió en probar el sistema con consultas SQL que incluían `INNER JOIN` y `LEFT JOIN`. Se demostró cómo el \textit{middleware} identificaba correctamente las tablas involucradas y generaba la relación explícita en Cypher. La precisión en la traducción de las relaciones fue el criterio de aceptación principal validado.
+Al concluir el Sprint 2, se logró el objetivo de implementar la traducción y ejecución de consultas \texttt{SELECT} simples. Los usuarios ahora pueden escribir una consulta SQL, obtener su equivalente en Cypher y ejecutarla contra su base de datos Neo4j, todo desde una única interfaz. La visualización de resultados en formato de tabla y las opciones de exportación añaden un valor significativo a la herramienta.
 
 \subsubsection{Sprint 2 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    El algoritmo de detección de relaciones demostró ser robusto para los casos de uso estándar. La visualización de las consultas complejas se mantuvo limpia y legible.
+    La integración de ANTLR para el parsing de SQL fue un éxito y sentó una base sólida para futuras extensiones de la gramática. La arquitectura del frontend, utilizando componentes reutilizables y un store centralizado, facilitó el desarrollo de una interfaz de usuario interactiva y cohesiva.
+    
     \item \textbf{¿Qué se puede mejorar?} \newline
-    La lógica para nombrar las relaciones en el grafo generó debates sobre la mejor convención a seguir. Se decidió estandarizar una nomenclatura para las relaciones generadas automáticamente para evitar ambigüedades en el futuro.
+    El manejo de errores en la traducción puede ser más robusto. Actualmente, si una consulta SQL no es válida, el sistema podría no proporcionar una retroalimentación clara al usuario. Se debería mejorar el visitor de ANTLR para capturar y reportar errores de sintaxis de manera más efectiva. Además, la visualización de resultados podría enriquecerse para incluir una vista de grafo, lo cual sería más intuitivo para una base de datos como Neo4j.
+    
 \end{itemize}
 
 
 \subsection{Sprint 3}
 \subsubsection{Sprint 3 Planning}
-El Sprint 3 se dedicó a mejorar la robustez del sistema mediante la gestión de errores y a establecer la conectividad real con la base de datos de destino. El objetivo fue permitir que la aplicación no solo tradujera, sino que también se comunicara con una instancia de Neo4j y manejara adecuadamente las excepciones.
+El objetivo de este sprint fue ampliar significativamente las capacidades del traductor SQL a Cypher. Se planificó extender la gramática ANTLR para soportar funcionalidades más avanzadas de SQL, incluyendo funciones de agregación (\texttt{COUNT}, \texttt{SUM}, etc.), agrupaciones (\texttt{GROUP BY}, \texttt{HAVING}), relaciones entre tablas (\texttt{JOIN}) y operaciones de manipulación de datos (\texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}).
 
 \subsubsection{Sprint 3 Backlog}
 La Tabla \ref{tab:sprintBacklog3} detalla las tareas del Sprint 3.
@@ -83,35 +235,63 @@ La Tabla \ref{tab:sprintBacklog3} detalla las tareas del Sprint 3.
 
 
 \subsubsection{Ejecución del Sprint 3}
-En este sprint se desarrollaron dos frentes importantes. Por un lado, se implementó el módulo de gestión de errores. Se creó el componente visual para alertas (T3.2) y se programó la lógica para ofrecer detalles específicos sobre errores de sintaxis o traducción, incluyendo sugerencias de corrección para el usuario (T3.3).
+El desarrollo se enfocó exclusivamente en el backend, específicamente en la mejora del parser y el visitor de ANTLR para dar soporte a las nuevas características del lenguaje SQL.
 
-Por otro lado, se abordó la conectividad. Se desarrolló el endpoint \texttt{POST /api/connection/test} (T4.1), diseñado para validar las credenciales de acceso a una base de datos Neo4j externa. Este servicio recibe la URI, usuario y contraseña, intenta establecer una sesión con el driver oficial y retorna el estado de la conexión. En el frontend, se integró este servicio en el formulario de conexión (T4.4), permitiendo al usuario recibir feedback inmediato sobre el estado de su conexión.
+\paragraph{Extensión de la Gramática y Lógica de Traducción}
+\subparagraph{Funciones de Agregación y Agrupación:}
+Se modificó el archivo de gramática \texttt{SQLSimple.g4} para incluir reglas que reconocen funciones de agregación y las cláusulas \texttt{GROUP BY} y \texttt{HAVING}. La clase \texttt{Visitor} fue actualizada para traducir estas construcciones a sus equivalentes en Cypher. Por ejemplo, una función \texttt{COUNT(columna)} se traduce a \texttt{count(n.columna)} y la cláusula \texttt{GROUP BY} se mapea a la cláusula \texttt{WITH} en Cypher para agrupar los resultados.
 
-\paragraph{Pruebas con Postman}
-Se realizaron pruebas específicas para el nuevo endpoint de conectividad:
+\subparagraph{Traducción de Relaciones (JOINs):}
+Se añadieron reglas a la gramática para los operadores \texttt{INNER JOIN}, \texttt{LEFT JOIN} y \texttt{RIGHT JOIN}. La lógica en el \texttt{Visitor} se extendió para interpretar estas uniones y generar las cláusulas \texttt{MATCH} correspondientes en Cypher que representan las relaciones entre nodos. Por ejemplo, un \texttt{INNER JOIN} entre dos tablas se traduce a un patrón \texttt{MATCH} que conecta dos tipos de nodos.
+
+\subparagraph{Traducción de DML (INSERT, UPDATE, DELETE):}
+Finalmente, se extendió la gramática para soportar las sentencias de manipulación de datos.
 \begin{itemize}
-    \item \textbf{Conexión Exitosa:} Se enviaron credenciales válidas de una instancia activa de Neo4j, verificando una respuesta 200 OK y un mensaje de confirmación.
-    \item \textbf{Fallos de Autenticación:} Se probaron credenciales incorrectas para asegurar que el sistema capturara la excepción del driver y devolviera un código 401 Unauthorized con un mensaje claro para el usuario.
-    \item \textbf{Errores de Red:} Se simularon escenarios con URIs inalcanzables para validar el manejo de tiempos de espera (timeouts).
+    \item \texttt{INSERT INTO}: Se traduce a una sentencia \texttt{CREATE} en Cypher para crear un nuevo nodo con las propiedades especificadas.
+    \item \texttt{UPDATE}: Se mapea a una combinación de \texttt{MATCH} y \texttt{SET} para encontrar los nodos a actualizar y modificar sus propiedades.
+    \item \texttt{DELETE}: Se convierte en una sentencia \texttt{MATCH} seguida de \texttt{DETACH DELETE} para eliminar los nodos y sus relaciones asociadas.
 \end{itemize}
 
-% Se sugiere agregar aquí una captura de pantalla del formulario de conexión o de un mensaje de error con sugerencia.
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+# app/core/parser/visitor.py
+class Visitor(SQLSimpleVisitor):
+    # ... (metodos existentes) ...
+
+    def visitInsert_statement(self, ctx: SQLSimpleParser.Insert_statementContext):
+        # Logica para traducir INSERT a CREATE
+        return "CREATE (n:Label {key: 'value'})"
+
+    def visitUpdate_statement(self, ctx: SQLSimpleParser.Update_statementContext):
+        # Logica para traducir UPDATE a MATCH y SET
+        return "MATCH (n:Label WHERE n.id = 1) SET n.property = 'new_value'"
+
+    def visitDelete_statement(self, ctx: SQLSimpleParser.Delete_statementContext):
+        # Logica para traducir DELETE a MATCH y DETACH DELETE
+        return "MATCH (n:Label WHERE n.id = 1) DETACH DELETE n"
+    \end{lstlisting}
+    \caption{Nuevos métodos en el Visitor para DML.}
+    \label{fig:sprint3_dml_visitor}
+\end{figure}
 
 \subsubsection{Sprint 3 Review}
-La demostración incluyó dos escenarios: uno fallido, donde se introdujo sintaxis SQL inválida para mostrar las nuevas alertas y sugerencias de corrección; y uno exitoso, donde se configuró la conexión a una instancia local de Neo4j, verificando que el sistema pudiera autenticarse correctamente.
+Al finalizar el Sprint 3, el traductor SQL a Cypher es considerablemente más potente. Ahora puede manejar una gama mucho más amplia de consultas SQL, incluyendo agregaciones, agrupaciones, uniones y operaciones de modificación de datos. Esto representa un hito importante en el proyecto, ya que la funcionalidad principal ha alcanzado un alto grado de madurez. Todas las nuevas reglas de traducción fueron validadas mediante pruebas unitarias que cubren diversos escenarios y casos de borde.
 
 \subsubsection{Sprint 3 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La implementación de sugerencias de corrección aportó un gran valor a la usabilidad del sistema. El uso del driver oficial de Neo4j simplificó la gestión de la conexión.
+    La base establecida con ANTLR en el sprint anterior demostró ser muy flexible y extensible, lo que permitió añadir las nuevas funcionalidades de manera estructurada y eficiente. El enfoque de desarrollo guiado por pruebas (TDD) fue clave para asegurar que las nuevas reglas de traducción funcionaran correctamente y no introdujeran regresiones en la funcionalidad existente.
+    
     \item \textbf{¿Qué se puede mejorar?} \newline
-    La gestión de estados de conexión en el frontend resultó más compleja de lo anticipado, requiriendo refactorización para asegurar que la sesión se mantuviera activa o se cerrara adecuadamente según la interacción del usuario.
+    La complejidad del \texttt{Visitor} ha aumentado significativamente. Sería beneficioso refactorizar esta clase para separar la lógica de traducción de las diferentes tipos de sentencias SQL en módulos o clases más pequeñas y especializadas. Esto mejoraría la mantenibilidad y legibilidad del código. Además, la traducción de \texttt{JOIN} complejos con múltiples condiciones podría optimizarse para generar patrones de Cypher más eficientes.
+    
 \end{itemize}
 
 
 \subsection{Sprint 4}
 \subsubsection{Sprint 4 Planning}
-Con la traducción y la conexión resueltas, el Sprint 4 se enfocó en cerrar el ciclo funcional: ejecutar las consultas traducidas y gestionar el historial de uso. El objetivo fue permitir al usuario ver los resultados reales de sus consultas en la base de datos de grafos y acceder a sus operaciones previas.
+El objetivo de este sprint fue mejorar la gestión de usuarios y la seguridad de la aplicación. Se planificó implementar la funcionalidad de actualización de perfil, el restablecimiento de contraseña y la administración de usuarios por parte de un administrador.
 
 \subsubsection{Sprint 4 Backlog}
 La Tabla \ref{tab:sprintBacklog4} detalla las tareas del Sprint 4.
@@ -120,35 +300,76 @@ La Tabla \ref{tab:sprintBacklog4} detalla las tareas del Sprint 4.
 
 
 \subsubsection{Ejecución del Sprint 4}
-Este sprint fue intensivo en integración. Se implementó el endpoint \texttt{POST /api/execute} (T5.2), el cual orquesta la ejecución de las consultas. Este servicio recibe la sentencia Cypher traducida y los parámetros de conexión, envía la instrucción a la base de datos Neo4j y procesa los registros retornados para devolverlos en una estructura JSON estandarizada.
+El desarrollo se distribuyó entre el backend y el frontend para implementar el flujo completo de las nuevas funcionalidades de gestión de usuarios.
 
-Para visualizar estos datos, se desarrolló un área de resultados versátil que permite alternar entre una vista tabular y una vista en formato JSON (T5.4), facilitando la inspección de la respuesta. Adicionalmente, se construyó el módulo de historial. Se implementó el almacenamiento local de las consultas ejecutadas (T6.1) y se desarrolló la vista del historial (T6.4). Una funcionalidad clave añadida fue la capacidad de reactivar una consulta antigua: al seleccionarla del historial, los cuadros de texto de traducción se rellenan automáticamente con la información guardada (T6.2), agilizando el flujo de trabajo del usuario.
+\paragraph{Actualización de Perfil y Restablecimiento de Contraseña}
+\subparagraph{Backend:}
+Se crearon nuevos endpoints para permitir a los usuarios actualizar su información de perfil (nombre, apellido) y para manejar el proceso de restablecimiento de contraseña. El flujo de restablecimiento de contraseña incluye:
+\begin{enumerate}
+    \item Un endpoint que recibe el correo electrónico del usuario, genera un token de restablecimiento único y lo envía por correo electrónico.
+    \item Un endpoint que valida el token recibido y permite al usuario establecer una nueva contraseña.
+\end{enumerate}
+Se implementó un servicio de correo electrónico para enviar el enlace de restablecimiento.
 
-\paragraph{Pruebas con Postman}
-Las pruebas se centraron en la ejecución real de consultas contra la base de datos:
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+# app/api/v1/endpoints/auth.py
+@router.post("/password-recovery/{email}", response_model=Msg)
+def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
+    """
+    Password Recovery
+    """
+    user = auth_service.get_user_by_email(db, email=email)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this email does not exist in the system.",
+        )
+    password_reset_token = password_reset_service.create_token(db, user_id=user.id)
+    email_service.send_reset_password_email(
+        email_to=user.email, username=user.first_name, token=password_reset_token.token
+    )
+    return {"msg": "Password recovery email sent"}
+    \end{lstlisting}
+    \caption{Endpoint para solicitar restablecimiento de contraseña.}
+    \label{fig:sprint4_password_recovery}
+\end{figure}
+
+\subparagraph{Frontend:}
+Se desarrollaron las pantallas correspondientes en el frontend:
 \begin{itemize}
-    \item \textbf{Ejecución de Consultas de Lectura:} Se enviaron sentencias \texttt{MATCH} válidas a través del endpoint de ejecución, verificando que la respuesta contuviera la estructura de nodos y relaciones esperada en formato JSON.
-    \item \textbf{Manejo de Respuestas Vacías:} Se validó el comportamiento del endpoint cuando la consulta no retorna resultados, asegurando que se devuelva una lista vacía y no un error.
-    \item \textbf{Integridad de Datos:} Se compararon los resultados obtenidos en Postman con los datos visualizados directamente en Neo4j Browser para garantizar la fidelidad de la información.
+    \item Una página de "Editar Perfil" donde los usuarios pueden modificar su información.
+    \item Un formulario para solicitar el correo de restablecimiento de contraseña.
+    \item Una página que recibe el token de la URL y permite al usuario ingresar su nueva contraseña.
 \end{itemize}
+Se añadieron las validaciones de formulario necesarias para asegurar, por ejemplo, que la nueva contraseña cumpla con los requisitos de seguridad.
 
-% Se sugiere agregar aquí una imagen del área de resultados mostrando datos en formato JSON o tabla.
+\paragraph{Gestión de Usuarios (Admin)}
+\subparagraph{Backend:}
+Se implementaron endpoints protegidos que solo pueden ser accedidos por usuarios con rol de "administrador". Estos endpoints permiten realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los usuarios del sistema.
+
+\subparagraph{Frontend:}
+Se creó una nueva sección en el dashboard, visible solo para administradores, que muestra una tabla con todos los usuarios registrados. Desde esta pantalla, un administrador puede ver, editar y eliminar usuarios, así como asignar roles.
 
 \subsubsection{Sprint 4 Review}
-En la revisión se ejecutó un flujo completo: ingresar SQL, traducir, conectar a la BD, ejecutar la traducción y visualizar los nodos retornados. También se navegó por el historial, recuperando consultas de sesiones anteriores. La funcionalidad de ejecución real fue el hito más celebrado por los interesados.
+Al finalizar el Sprint 4, la aplicación cuenta con un conjunto completo de herramientas para la gestión de cuentas de usuario. Los usuarios pueden gestionar su propia información y recuperar el acceso a sus cuentas si olvidan la contraseña. Los administradores tienen ahora la capacidad de supervisar y administrar a todos los usuarios del sistema. Estas características mejoran significativamente la usabilidad y la seguridad de la plataforma.
 
 \subsubsection{Sprint 4 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La visualización dual (Tabla/JSON) fue muy bien recibida. El mecanismo de persistencia del historial funcionó correctamente sin afectar el rendimiento.
+    La implementación del flujo de restablecimiento de contraseña, que involucra la generación de tokens, el envío de correos electrónicos y la validación, se completó con éxito y funciona de manera robusta. La protección de rutas y endpoints basada en roles se implementó correctamente, asegurando que solo los usuarios autorizados puedan acceder a las funciones de administración.
+    
     \item \textbf{¿Qué se puede mejorar?} \newline
-    El volumen de tareas en este sprint fue alto. Aunque se completaron, la carga de trabajo fue considerable. Se aprendió la importancia de no sobrecargar los sprints finales con funcionalidades críticas de integración.
+    El sistema de envío de correos electrónicos es funcional, pero podría beneficiarse del uso de plantillas HTML para que los correos sean más atractivos y profesionales. En la gestión de usuarios, se podría añadir una funcionalidad de búsqueda y filtrado para que los administradores puedan encontrar usuarios más fácilmente. La auditoría de acciones de administrador (quién hizo qué y cuándo) sería una adición valiosa para la seguridad y el monitoreo.
+    
 \end{itemize}
 
 
 \subsection{Sprint 5}
 \subsubsection{Sprint 5 Planning}
-El último sprint, el Sprint 5, se destinó a funcionalidades de valor añadido y cierre del desarrollo. El objetivo principal fue dotar al sistema de capacidades de exportación de datos, permitiendo a los usuarios extraer la información obtenida para su uso en otras herramientas.
+El objetivo de este sprint fue introducir funcionalidades para la gestión y el monitoreo de la actividad en la aplicación. Se planificó implementar la administración de conexiones guardadas, un historial de consultas ejecutadas y un sistema de visualización de logs de actividad.
 
 \subsubsection{Sprint 5 Backlog}
 La Tabla \ref{tab:sprintBacklog5} detalla las tareas del Sprint 5.
@@ -157,33 +378,74 @@ La Tabla \ref{tab:sprintBacklog5} detalla las tareas del Sprint 5.
 
 
 \subsubsection{Ejecución del Sprint 5}
-Las tareas de este sprint se centraron en la manipulación de datos para exportación. Se desarrolló un servicio de transformación capaz de convertir la estructura jerárquica del JSON (resultado de Neo4j) a un formato plano CSV (T7.1). Aunque esta lógica se ejecuta principalmente del lado del cliente para optimizar el rendimiento, se implementaron validaciones para asegurar la integridad de los datos antes de la conversión.
+El desarrollo se centró en crear nuevas secciones en el backend y frontend para que los usuarios puedan gestionar sus recursos y para que los administradores puedan monitorear la actividad del sistema.
 
-Complementando esto, se implementó la función de descarga en el frontend (T7.2), integrando un botón que desencadena la conversión y genera el archivo descargable para el usuario. Además, se aprovechó este sprint para realizar pruebas finales de integración y pulir detalles estéticos de la interfaz antes de la entrega final.
+\paragraph{Gestión de Conexiones}
+\subparagraph{Backend:}
+Se expandió la funcionalidad de conexiones para permitir operaciones CRUD completas. Se crearon endpoints para que los usuarios puedan listar, actualizar y eliminar sus conexiones a bases de datos guardadas.
 
-\paragraph{Pruebas de Integración}
-Dado que la exportación depende de la correcta estructura de los datos recibidos, se realizaron pruebas de flujo completo:
-\begin{itemize}
-    \item \textbf{Validación de Estructura JSON:} Se utilizó Postman para verificar que el endpoint de ejecución (\texttt{/api/execute}) retornara siempre un JSON válido y bien formado, requisito indispensable para el parser de CSV.
-    \item \textbf{Pruebas de Descarga:} Se verificó manualmente que los archivos generados pudieran abrirse correctamente en software de hojas de cálculo y que los caracteres especiales (tildes, ñ) se codificaran correctamente.
-\end{itemize}
+\subparagraph{Frontend:}
+Se desarrolló una nueva página en el dashboard que muestra las conexiones guardadas por el usuario en forma de tarjetas. Cada tarjeta muestra los detalles de la conexión y ofrece botones para editarla o eliminarla.
 
-% Se sugiere agregar aquí un fragmento de código de la función de conversión JSON a CSV.
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}
+// src/app/dashboard/connections/page.tsx
+"use client";
+import { ConnectionCard } from "@/components/connections/ConnectionCard";
+import { useConnectionStore } from "@/store/useConnectionStore";
+// ...
+
+export default function ConnectionsPage() {
+  const { connections, fetchConnections } = useConnectionStore();
+
+  useEffect(() => {
+    fetchConnections();
+  }, [fetchConnections]);
+
+  return (
+    // ...
+    {connections.map((connection) => (
+      <ConnectionCard key={connection.id} connection={connection} />
+    ))}
+    // ...
+  );
+}
+    \end{lstlisting}
+    \caption{Página de gestión de conexiones.}
+    \label{fig:sprint5_connections_page}
+\end{figure}
+
+\paragraph{Historial de Consultas}
+\subparagraph{Backend:}
+Se implementó un mecanismo para guardar cada consulta que un usuario traduce y/o ejecuta. Se creó un nuevo modelo en la base de datos (\texttt{Query}) y un endpoint para que los usuarios puedan recuperar su historial de consultas.
+
+\subparagraph{Frontend:}
+Se desarrolló una pantalla de "Historial" que muestra una lista de las consultas realizadas por el usuario. Cada elemento de la lista muestra la consulta SQL original, la consulta Cypher traducida y la fecha en que se realizó. Esto permite a los usuarios reutilizar consultas anteriores fácilmente.
+
+\paragraph{Visualización de Logs}
+\subparagraph{Backend:}
+Se configuró un sistema de logging para registrar eventos importantes de la aplicación, como inicios de sesión, errores de traducción o consultas ejecutadas. Se creó un endpoint, accesible solo para administradores, que permite recuperar estos logs.
+
+\subparagraph{Frontend:}
+Se desarrolló una pantalla de "Logs" en la sección de administración. Esta pantalla muestra los logs en un formato claro y estructurado, permitiendo a los administradores monitorear la salud y el uso del sistema en tiempo real.
 
 \subsubsection{Sprint 5 Review}
-La revisión final sirvió para presentar el producto completo. Se demostró la nueva funcionalidad de exportación descargando los resultados de una consulta compleja y abriéndolos en una hoja de cálculo externa. El sistema fue validado en su totalidad, cumpliendo con los requisitos de traducción, ejecución y gestión de datos definidos al inicio del proyecto.
+Al finalizar el Sprint 5, la aplicación ha ganado importantes capacidades de gestión y monitoreo. Los usuarios ahora tienen un control total sobre sus conexiones guardadas y pueden acceder a su historial de trabajo. Los administradores disponen de una herramienta de logging para supervisar la actividad del sistema. Estas características hacen que la aplicación sea más robusta, usable y administrable.
 
 \subsubsection{Sprint 5 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    El sprint fue menos cargado, lo que permitió dedicar tiempo a la estabilización del código y corrección de pequeños bugs visuales. La funcionalidad de exportación funcionó a la primera gracias a las pruebas unitarias previas.
+    La implementación de las funcionalidades CRUD para conexiones y el historial de consultas se realizó de manera fluida. La arquitectura existente facilitó la adición de nuevos modelos y endpoints. El sistema de logging proporciona información valiosa para la depuración y el monitoreo.
+    
     \item \textbf{¿Qué se puede mejorar?} \newline
-    Mirando hacia atrás en todo el proyecto, se podría haber integrado la funcionalidad de exportación antes, ya que resultó ser muy útil para las pruebas de los propios desarrolladores.
+    La visualización de logs es funcional, pero podría mejorarse con capacidades de filtrado y búsqueda por nivel de severidad, usuario o rango de fechas. Para el historial de consultas, sería útil añadir una función para "marcar como favorito" las consultas más utilizadas. En la gestión de conexiones, se podría añadir un indicador visual del estado de la conexión (activa/inactiva) en tiempo real.
+    
 \end{itemize}
 
 \subsection{Sprint 6}
 \subsubsection{Sprint 6 Planning}
-El último sprint, el Sprint 6, se destinó a funcionalidades de valor añadido y cierre del desarrollo. El objetivo principal fue dotar al sistema de capacidades de exportación de datos, permitiendo a los usuarios extraer la información obtenida para su uso en otras herramientas.
+El objetivo del último sprint fue implementar un dashboard de estadísticas para proporcionar una visión general del uso y rendimiento del sistema. Esta funcionalidad está dirigida principalmente a los administradores para que puedan monitorear la actividad de la plataforma.
 
 \subsubsection{Sprint 6 Backlog}
 La Tabla \ref{tab:sprintBacklog6} detalla las tareas del Sprint 6.
@@ -192,26 +454,89 @@ La Tabla \ref{tab:sprintBacklog6} detalla las tareas del Sprint 6.
 
 
 \subsubsection{Ejecución del Sprint 6}
-Las tareas de este sprint se centraron en la manipulación de datos para exportación. Se desarrolló un servicio de transformación capaz de convertir la estructura jerárquica del JSON (resultado de Neo4j) a un formato plano CSV (T7.1). Aunque esta lógica se ejecuta principalmente del lado del cliente para optimizar el rendimiento, se implementaron validaciones para asegurar la integridad de los datos antes de la conversión.
+El trabajo se concentró en la recopilación de datos en el backend y la presentación de estos datos de forma visual en el frontend.
 
-Complementando esto, se implementó la función de descarga en el frontend (T7.2), integrando un botón que desencadena la conversión y genera el archivo descargable para el usuario. Además, se aprovechó este sprint para realizar pruebas finales de integración y pulir detalles estéticos de la interfaz antes de la entrega final.
-
-\paragraph{Pruebas de Integración}
-Dado que la exportación depende de la correcta estructura de los datos recibidos, se realizaron pruebas de flujo completo:
+\paragraph{Obtención y Exposición de Estadísticas}
+\subparagraph{Backend:}
+Se desarrolló un nuevo servicio de analíticas (\texttt{analytics\_service.py}) encargado de calcular diversas métricas del sistema. Este servicio realiza consultas a la base de datos para obtener datos como:
 \begin{itemize}
-    \item \textbf{Validación de Estructura JSON:} Se utilizó Postman para verificar que el endpoint de ejecución (\texttt{/api/execute}) retornara siempre un JSON válido y bien formado, requisito indispensable para el parser de CSV.
-    \item \textbf{Pruebas de Descarga:} Se verificó manualmente que los archivos generados pudieran abrirse correctamente en software de hojas de cálculo y que los caracteres especiales (tildes, ñ) se codificaran correctamente.
+    \item Número total de usuarios registrados.
+    \item Número de consultas traducidas.
+    \item Tipos de sentencias SQL más comunes (\texttt{SELECT}, \texttt{INSERT}, etc.).
+    \item Actividad de los usuarios a lo largo del tiempo.
+\end{itemize}
+Se creó un endpoint \texttt{/analytics} protegido, accesible solo para administradores, que devuelve estas estadísticas en formato JSON.
+
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}[language=Python]
+# app/api/v1/endpoints/analytics.py
+@router.get("/", response_model=AnalyticsData)
+def get_analytics_data(
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_admin),
+) -> Any:
+    """
+    Retrieve analytics data.
+    """
+    analytics_data = analytics_service.get_analytics(db)
+    return analytics_data
+    \end{lstlisting}
+    \caption{Endpoint para obtener datos de analítica.}
+    \label{fig:sprint6_analytics_endpoint}
+\end{figure}
+
+\paragraph{Dashboard de Estadísticas}
+\subparagraph{Frontend:}
+Se desarrolló una nueva página de "Dashboard" en la sección de administración. Esta página consume los datos del endpoint \texttt{/analytics} y los presenta de manera visual utilizando gráficos y tarjetas informativas. Se utilizó una librería de gráficos como Chart.js (a través de un wrapper para React) para crear visualizaciones como:
+\begin{itemize}
+    \item Tarjetas que muestran el total de usuarios, traducciones y conexiones.
+    \item Un gráfico de barras mostrando la distribución de los tipos de sentencias SQL.
+    \item Un gráfico de líneas mostrando el número de registros de nuevos usuarios a lo largo del tiempo.
 \end{itemize}
 
-% Se sugiere agregar aquí un fragmento de código de la función de conversión JSON a CSV.
+\begin{figure}[H]
+    \centering
+    \begin{lstlisting}
+// src/app/dashboard/admin/page.tsx
+"use client";
+// ... imports para componentes de graficos y store ...
+
+export default function AdminDashboardPage() {
+  // ... Logica para obtener los datos de analitica del store ...
+
+  return (
+    <div>
+      <h1>Admin Dashboard</h1>
+      {/* Tarjetas con estadisticas principales */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card title="Total Users" value={analytics.totalUsers} />
+        <Card title="Total Translations" value={analytics.totalTranslations} />
+        {/* ... mas tarjetas ... */}
+      </div>
+      
+      {/* Graficos */}
+      <div className="mt-8">
+        <BarChart data={analytics.statementTypes} />
+        <LineChart data={analytics.userRegistrations} />
+      </div>
+    </div>
+  );
+}
+    \end{lstlisting}
+    \caption{Componente del dashboard de administración.}
+    \label{fig:sprint6_admin_dashboard}
+\end{figure}
 
 \subsubsection{Sprint 6 Review}
-La revisión final sirvió para presentar el producto completo. Se demostró la nueva funcionalidad de exportación descargando los resultados de una consulta compleja y abriéndolos en una hoja de cálculo externa. El sistema fue validado en su totalidad, cumpliendo con los requisitos de traducción, ejecución y gestión de datos definidos al inicio del proyecto.
+Al finalizar el Sprint 6 y, con ello, el ciclo de desarrollo principal del proyecto, la aplicación cuenta con un dashboard de analíticas completo y funcional. Los administradores ahora pueden obtener una visión clara y cuantitativa del uso del sistema, lo que les permite tomar decisiones informadas sobre su gestión y evolución. La presentación visual de los datos facilita la comprensión de las tendencias y patrones de uso.
 
 \subsubsection{Sprint 6 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    El sprint fue menos cargado, lo que permitió dedicar tiempo a la estabilización del código y corrección de pequeños bugs visuales. La funcionalidad de exportación funcionó a la primera gracias a las pruebas unitarias previas.
+    La implementación del dashboard fue un éxito. La separación entre la lógica de negocio para calcular las estadísticas en el backend y la capa de presentación en el frontend funcionó muy bien. El uso de una librería de gráficos facilitó la creación de un dashboard atractivo e informativo con un esfuerzo de desarrollo moderado.
+    
     \item \textbf{¿Qué se puede mejorar?} \newline
-    Mirando hacia atrás en todo el proyecto, se podría haber integrado la funcionalidad de exportación antes, ya que resultó ser muy útil para las pruebas de los propios desarrolladores.
+    El dashboard actual proporciona una excelente visión general, pero podría ser aún más útil si fuera interactivo. Por ejemplo, permitir a los administradores filtrar las estadísticas por rangos de fechas. Las consultas para calcular las analíticas podrían volverse lentas a medida que el volumen de datos crece; se podría considerar la implementación de un sistema de caché o la pre-calculación de estadísticas en segundo plano para optimizar el rendimiento.
+    
 \end{itemize}
