@@ -1,0 +1,50 @@
+\begin{longtable}[c]{|m{0.25\textwidth}|m{0.7\textwidth}|}
+    \caption{Caso de prueba: Traducir sente4ncia con operaciones INSERT}
+    \label{tab:casoPrueba03} \\
+    
+     \hline
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{Campo}} & \multicolumn{1}{c|}{\textbf{Descripción}} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{Campo}} & \multicolumn{1}{c|}{\textbf{Descripción}} \\
+    \hline
+    \endhead
+
+    \multicolumn{2}{r}{\textit{Continúa en la siguiente página...}} \\
+    \endfoot
+    
+    \endlastfoot
+
+    \textbf{ID} & CP-03 \\
+    \hline
+    \textbf{Historia de Usuario} & QTE-04 \\
+    \hline
+    \textbf{Nombre} & Traducir consultas \texttt{INSERT} \\
+    \hline
+    \textbf{Cumple (Sí/No)} & Sí \\
+    \hline
+    \textbf{Descripción de la Prueba} & Verificar que el sistema permita traducir consultas \texttt{INSERT} correctamente. \\
+    \hline
+    \textbf{Precondiciones} & \begin{itemize}
+        \item El usuario debe estar autenticado en el sistema.
+        \item El usuario debe tener una conexión a Neo4j almacenada y activa.
+    \end{itemize} \\
+    \hline
+    \textbf{Pasos} & \begin{itemize}
+        \item Acceder a la pantalla de traducción de consultas.
+        \item Seleccionar una conexión a Neo4j activa.
+        \item Ingresar una sentencia SQL \texttt{INSERT} válida.
+        \item Dar clic en el boton \textbf{Traducir}.
+    \end{itemize} \\
+    \hline
+    \textbf{Datos de Prueba} & \textbf{Sentencia:} \texttt{INSERT INTO Usuario (nombre, edad) VALUES ('Usuario Nuevo', 20);} \\
+    \hline
+    \textbf{Resultados Esperados} & El sistema indica el equivalente en lenguaje Cypher junto a la sentencia SQL ingresada. \\
+    \hline
+    \textbf{Resultados Obtenidos} & El sistema mostró un mnesaje de éxito de consulta traducida y la consulta equivalente en lenguaje Cypher junto a la consulta SQL ingresada, además del tiempo de traducción. \\
+    \hline
+\end{longtable}
