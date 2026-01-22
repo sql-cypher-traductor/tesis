@@ -1,11 +1,9 @@
-% Basado en la experiencia adquirida durante el desarrollo de este proyecto y los resultados obtenidos, se formulan las siguientes recomendaciones para trabajos futuros y la evolución de la herramienta:
+Una vez finalizado el desarrollo del \textit{middleware} y en base al trabajo realizado, se plantean las siguientes recomendaciones que permitirán fortalecer y ampliar las caracterísiticas del producto software realizado. 
 
-% \begin{itemize}
-%     \item \textbf{Expansión de la Gramática SQL:} Se recomienda ampliar el motor de traducción para soportar características más avanzadas del lenguaje SQL, tales como subconsultas anidadas, funciones de agregación (\texttt{GROUP BY}, \texttt{HAVING}) y operaciones de modificación de datos (\texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}). Esto permitiría una gestión completa del ciclo de vida de los datos desde la interfaz del \textit{middleware}.
-
-%     \item \textbf{Visualización Gráfica de Resultados:} Aunque la visualización en formato JSON y tabular es funcional, se sugiere integrar una librería de visualización de grafos (como D3.js o Vis.js) en el \textit{frontend}. Esto permitiría a los usuarios ver los nodos y relaciones de manera gráfica e interactiva, aprovechando al máximo la naturaleza visual de las bases de datos orientadas a grafos.
-
-%     \item \textbf{Soporte Multilenguaje y Multibase:} Para aumentar la versatilidad de la herramienta, sería beneficioso investigar la implementación de adaptadores para otros lenguajes de consulta de grafos, como Gremlin, y otras bases de datos más allá de Neo4j, como Amazon Neptune o JanusGraph.
-
-%     \item \textbf{Optimización de Rendimiento:} Se aconseja realizar pruebas de estrés con volúmenes masivos de datos para identificar posibles cuellos de botella en el proceso de traducción y renderizado de resultados. Implementar mecanismos de paginación en el servidor y carga diferida (\textit{lazy loading}) en el cliente mejoraría la respuesta del sistema ante consultas que retornan miles de nodos.
-% \end{itemize}
+\begin{itemize}
+    \item Para mejorar el método de trabajo se recomienda la inversión en la capacitación de los miembros del equipo sobre tecnologías emergentes y otros conocimientos que aumenten su productividad y rendimiento, además de fomentar un ambiente comunicativo que permita tener una visión más amplia y clara del desafío de negocio, mismo que ayudará a realizar un análisis riguroso y detallado durante la toma de decisiones al construir un producto.
+    \item Para el uso de conexiones muy frecuentes a bases de datos, se recomienda la  implementación para seleccionar una base de datos como predeterminada, con esto se evita la búsqueda y selección de forma manual en reiteradas ocasiones, aumentando la familiaridad e interés de uso de los usuarios.
+    \item También se recomienda la extensión de la gramática SQL soportada para la traducción, incluyendo operaciones DDL útil para el manejo completo de tablas y esquemas dentro de las bases de datos SQL, mismos que son útiles para un control total de los datos dentro de una base de datos.
+    \item Debido a su fácil integración tanto con bases de datos relacionales como oreintadas a grafos, se recomienda la inclusión de otros dialectos y la compatibilidad con otros DBMS como Postgres, MySQL, Amazon Neptune o ArangoDB.
+    \item Se recomienda la implementación de pruebas de estrés que permitan identificar posibles cuellos de botella durante el proceso de traducción y ejecución de consultas, además del renderizado de resultados a grafos.
+\end{itemize}
