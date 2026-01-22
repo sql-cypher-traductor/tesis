@@ -2,7 +2,7 @@ En esta fase se detalla todo el desarrollo del \textit{middleware} para traducir
 
 \subsection{Sprint 1}
 \subsubsection{Sprint 1 Planning}
-El objetivo principal del Sprint 1 fue implementar el servicio de autenticación y la conexión a los DBMS tanto de SQL Server como de Neo4j. Con esto se busca establecer las funciones de acceso al sistema y que el usuario sea capaz de configurar la conexión a las bases de datos con las cuales desea interactuar.
+El objetivo principal del Sprint 1 fue implementar el servicio de autenticación y la conexión a los DBMS tanto de SQL Server como de Neo4j. Con esto se busca establecer las funciones de acceso al sistema y configurar la conexión a las bases de datos para acceder e interactuar con ellas.
 
 \subsubsection{Sprint 1 Backlog}
 La Tabla \ref{tab:sprintBacklog1} detalla las tareas del Backlog para esta primera iteración, mismas que abordan las Historias de Usuario AUM-01 y CON-01.
@@ -10,117 +10,143 @@ La Tabla \ref{tab:sprintBacklog1} detalla las tareas del Backlog para esta prime
 \input{../03Tables/02Chapter/C2.tableSprintBacklog1}
 
 \subsubsection{Ejecución del Sprint 1}
-Este apartado lo dividiremos en 2 partes: el desarrollo del servicio de autenticación y la implementación de la conexión a las DBMS.
+Este apartado lo dividiremos en 2 partes: el desarrollo del backend y la implementación del frontend.
 
-\paragraph{Servicio de Autenticación}
-Para el servicio de autenticación, se implementaron las funcionalidades de registro e inicio de sesión en este Sprint.
+\paragraph{Backend}
+\subparagraph{Implementación de modelos y DTOs:} Para implementar la autenticación de usuarios y gestión de conexiones, se procedió a definir los modelos de datos necesarios utilizando la biblioteca \texttt{SQLAlchemy}, misma que permite gestionar la información contenida en la base de datos del sistema garantizando su seguridad e integridad.
 
-\subparagraph{Backend:}
+A continuación, se presenta un fragmento de los modelos principales \texttt{User} y \texttt{DbConnection} necesarios para la gestión de usuarios y conexiones respectivamente.
 
-Se crearon los endpoints \texttt{/api/v1/auth/register} y \texttt{/api/v1/auth/login} para las funciones previamente mencionadas. El endpoint de registro maneja la creación de nuevos usuarios, validando que los correos electrónicos no se dupliquen para las distintas cuentas y asegurando el almacenamiento seguro de contraseñas mediante encriptación bcrypt. Por otra parte, el endpoint de inicio de sesión verifica las credenciales del usuario y, si son correctas, genera un token de acceso JWT que se utilizará para autenticar las solicitudes posteriores.
 
-\begin{figure}[H]
-    \centering
-    \begin{lstlisting}[language=Python]
-# app/api/v1/endpoints/auth.py
-@router.post("/register", response_model=User)
-def register(*,
-    db: Session = Depends(deps.get_db),
-    user_in: UserCreate,
-) -> Any:
-    " Crear nuevo usuario. "
-    user = auth_service.get_user_by_email(db, email=user_in.email)
-    if user:
-        raise HTTPException(
-            status_code=400,
-            detail="El usuario con este correo ya existe en el sistema.",
-        )
-    user = auth_service.create_user(db, user_in=user_in)
-    return user
-    \end{lstlisting}
-    \caption{Endpoint de registro de usuario.}
-    \label{fig:sprint1_register_endpoint}
-\end{figure}
+\begin{lstlisting}[language=Python]
+    # Modelo de datos para Usuario
+    class User(Base):
+    __tablename__ = "users"
 
-\subparagraph{Frontend:}
+    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    full_name = Column(String, nullable=True)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    connections = relationship("DbConnection", back_populates="owner")
+
+    # Modelo de datos para Conexiones a BD
+    class DbConnection(Base):
+    __tablename__ = "db_connections"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    alias = Column(String, nullable=False)
+    engine = Column(String, nullable=False)
+    host = Column(String, nullable=False)
+    port = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    encrypted_password = Column(String, nullable=False)
+    db_name = Column(String, nullable=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+
+    owner = relationship("User", back_populates="connections")
+\end{lstlisting}
+
+Una vez implementada la estructura de modelos y utilizando la biblioteca \texttt{Pydantic}, se definieron los DTOs para validar qué datos se ingresarán al sistema y a cuáles tendrán acceso al usuario. Se realizaron DTOs tanto para usuarios, como para conexiones y además para el envío de tokens, mismos que serán utilizados para el inicio de sesión del cual se tratará más adelante. En la parte inferior se puede visualizar un extracto de código correspodiente a los DTOs para la gestión de los usuarios.
+
+\begin{lstlisting}[language=Python]
+    class UserDTO(BaseModel):
+        email: EmailStr
+
+    class UserCreateDTO(UserDTO):
+        password: str = Field(..., min_length=6)
+        full_name: Optional[str] = None
+
+    class UserResponseDTO(UserDTO):
+        id: UUID
+        full_name: Optional[str] = None
+        is_active: bool
+        created_at: datetime
+
+        class Config:
+            from_attributes = True
+
+\end{lstlisting}
+
+
+\subparagraph{Cifrado de contraseñas y manejo de sesiones} 
+En el servicio de autenticación, se implementó el algoritmo Bcrypt para hashear la contraseña del usuario previo a ser almacenada.
+
+\begin{lstlisting}
+    def get_password_hash(password):
+        pwd_bytes = password.encode("utf-8")
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed.decode("utf-8")
+\end{lstlisting}
+
+Por su parte, para el manejo de sesiones se utilizó JWT, mismo que genera tokens que contiene información del usuario cifrada y un tiempo de expiración. El tiempo de caducidad del token está configurado para 15 minutos y la firma para generación de tokens se obtiene de las variables de entorno con lo cual se refuerza la seguridad del software.
+
+\begin{lstlisting}
+    def create_access_token(data: dict, expires_delta: Optional[timedelta]):
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.now() + expires_delta
+        else:
+            expire = datetime.now() + timedelta(minutes=15)
+
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+\end{lstlisting}
+
+Para el almacenamiento de conexiones a bases de datos, se utilizó el sistema Fernet, que se encargará de encriptar las contraseñas de las BD previo a ser almacenadas.
+
+\begin{lstlisting}
+    def encrypt_credential(raw_password: str) -> str:
+        return cipher_suite.encrypt(raw_password.encode()).decode()
+\end{lstlisting}
+
+
+\subparagraph{Especificación de Endpoints}
+En este sprint, se implementaron las peticiones HTTP asociadas a las funcionalidades de autenticación y conexión a base de datos. En la Tabla \ref{tab:endpointsSprint01} se detalla cada uno de los endpoints desarrollados y la función que cumplen.
+
+\input{../03Tables/02Chapter/C2.tableEndpointsSprint01}
+
+\paragraph{Frontend:}
 Aquí se construyeron las pantallas respectivas para registro y login. Se utilizó la librería Zod para validar los campos desde el lado del cliente asegurando que cumplan los formatos correctos previo a la integración con el backend. La gestión del estado de autenticación se maneja con Zustand, almacenando el token de acceso y la información del usuario de forma segura.
 
-\begin{figure}[H]
-    \centering
-    \begin{lstlisting}
-// src/app/auth/login/page.tsx
-"use client";
-import { useAuthStore } from "@/store/useAuthStore";
-// ...
+\begin{lstlisting}
+    "use client";
+    import { useAuthStore } from "@/store/useAuthStore";
+    // ...
 
-export default function LoginPage() {
-  const { login, isLoading, error } = useAuthStore();
-  // ...
-  const onSubmit = async (values: LoginData) => {
-    await login(values);
-  };
-  // ...
-}
-    \end{lstlisting}
-    \caption{Componente de la página de inicio de sesión.}
-    \label{fig:sprint1_login_page}
-\end{figure}
-
-\paragraph{Conexión a las DBMS}
-Para la interacción del usuario con bases de datos a su elección, se implementó la funcionalidad de configuración de las conexiones tanto las bases de datos de SQL Server como Neo4j.
-
-\subparagraph{Backend:}
-El endpoint creado recibe los detalles de conexión como el nombre de la base de datos, las credenciales de acceso al DBMS o el tipo de base de datos donde se diferencia si esta es relacional u orientada a grafos, luego las valida y almacena en la base de datos asociándolo al usuario autenticado. También se implementó una función de prueba de conectividad previo a guardar la configuración.
-
-\begin{figure}[H]
-    \centering
-    \begin{lstlisting}[language=Python]
-# app/api/v1/endpoints/connections.py
-@router.post("/", response_model=Connection)
-def create_connection(
-    *,
-    db: Session = Depends(deps.get_db),
-    connection_in: ConnectionCreate,
-    current_user: User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    Create new connection.
-    """
-    connection = connection_service.create_connection(
-        db=db, connection_in=connection_in, user_id=current_user.id
-    )
-    return connection
-    \end{lstlisting}
-    \caption{Endpoint para crear una conexión.}
-    \label{fig:sprint1_create_connection_endpoint}
-\end{figure}
-
-\subparagraph{Frontend:}
-Dentro del frontend, se implementó un modal en la interfaz de usuario donde los usuarios deben ingresar los detalles de la conexión (host, puerto, usuario, contraseña, etc.). Este modal está integrado directamente con la lógica de configuración de conexiones implementada en el backend y maneja una basta retroalimentación que indica al usuario de forma amigable si existen o no problemas de conexión.
-
-\begin{figure}[H]
-    \centering
-    \begin{lstlisting}  
-// src/components/connections/ConnectionModal.tsx
-"use client";
-import { useConnectionStore } from "@/store/useConnectionStore";
-// ...
-
-export function ConnectionModal() {
-  const { createConnection, loading } = useConnectionStore();
-  // ...
-  const onSubmit = async (data: ConnectionFormData) => {
-    const success = await createConnection(data);
-    if (success) {
-      // ...
+    export default function LoginPage() {
+    const { login, isLoading, error } = useAuthStore();
+    // ...
+    const onSubmit = async (values: LoginData) => {
+        await login(values);
+    };
+    // ...
     }
-  };
-  // ...
-}
-    \end{lstlisting}
-    \caption{Componente del modal de conexión.}
-    \label{fig:sprint1_connection_modal}
-\end{figure}
+\end{lstlisting}
+
+Además, se implementó un modal en la interfaz de usuario donde los usuarios deben ingresar los detalles de la conexión (host, puerto, usuario, contraseña, etc.). Este modal está integrado directamente con la lógica de configuración de conexiones implementada en el backend y maneja una basta retroalimentación que indica al usuario de forma amigable si existen o no problemas de conexión.
+
+\begin{lstlisting}  
+    "use client";
+    import { useConnectionStore } from "@/store/useConnectionStore";
+    // ...
+
+    export function ConnectionModal() {
+    const { createConnection, loading } = useConnectionStore();
+    // ...
+    const onSubmit = async (data: ConnectionFormData) => {
+        const success = await createConnection(data);
+        if (success) {
+        // ...
+        }
+    };
+    // ...
+    }
+\end{lstlisting}
 
 \subsubsection{Sprint 1 Review}
 Al finalizar el Sprint 1, se completaron con éxito las tareas planificadas en el backlog. El sistema ahora cuenta con un servicio de autenticación funcional que permite a los usuarios registrarse e iniciar sesión de forma segura. Asimismo, la aplicación brinda la facilidad para configurar y almacenar las credenciales de sus bases de datos SQL Server y Neo4j. A través de las pruebas unitarias y de integración realizadas se asegura la calidad y estabilidad de la implementación en esta primera iteración.

@@ -1,0 +1,39 @@
+\begin{longtable}[c]{|c|l|m{0.4\textwidth}|}
+    \caption{Endpoints de autenticación y gestión de conexiones}
+    \label{tab:endpointsSprint01} \\
+    
+     \hline
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{Método HTTP}} & \multicolumn{1}{c|}{\textbf{Endpoint}} & \multicolumn{1}{c|}{\textbf{Descripción}} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \rowcolor{gray!50}
+    \multicolumn{1}{|c|}{\textbf{Método HTTP}} & \multicolumn{1}{c|}{\textbf{Endpoint}} & \multicolumn{1}{c|}{\textbf{Descripción}} \\
+    \hline
+    \endhead
+
+    \multicolumn{2}{r}{\textit{Continúa en la siguiente página...}} \\
+    \endfoot
+    
+    \endlastfoot
+
+    GET & \texttt{/connections} & Indica todas las conexiones del usuario. \\
+    \hline
+    GET & \texttt{/connections/conn-id} & Indica los detalles de una conexión específica. \\
+    \hline
+    POST & \texttt{/connections} & Agrega una nueva conexión. \\
+    \hline
+    PUT & \texttt{/connections/conn-id} & Actualiza una conexión existente. \\
+    \hline
+    DELETE & \texttt{/connections/conn-id} & Elimina una conexión \\
+    \hline
+    POST & \texttt{/connections/conn-id/test} & Permite realizar pruebas de conexión. \\
+    \hline
+    POST & \texttt{/auth/register} & Permite registrar un nuevo usuario. \\
+    \hline
+    POST & \texttt{/auth/login} & Permite iniciar sesión y solicita la generación un token JWT. \\
+    \hline
+    
+\end{longtable}

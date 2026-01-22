@@ -27,42 +27,79 @@ La Tabla \ref{tab:tareasEspecificas} se presenta las tareas indicadas a los usua
 
 \input{../03Tables/03Chapter/C3.tableSpecificTasks}
 
-\subsection{Resultados de las Pruebas}
-% Para validar la efectividad y la calidad del \textit{middleware} desarrollado, se llevó a cabo una fase exhaustiva de pruebas. Esta fase se dividió en dos categorías principales: pruebas funcionales, orientadas a verificar el correcto funcionamiento de la traducción y ejecución de sentencias; y pruebas de usabilidad, enfocadas en evaluar la experiencia del usuario al interactuar con la interfaz gráfica. A continuación, se detallan la metodología empleada y los resultados obtenidos en cada una de estas evaluaciones.
+\subsection{System Usability Scalie (SUS)}
+Para complementar los resultados obtenidos al ejecutar las tareas específicas, se utilizó el sistema SUS, que permite evaluar la usabilidad completa a través de un cuestionario de 10 preguntas, mismas que serán evaluadas utilizando la escala de Likert.
+
+Las preguntas definidas por SUS se pueden observar en la Tabla \ref{tab:preguntasSUS}:
+
+\input{../03Tables/03Chapter/C3.tableSUSQuestions}
+
+La escala de Likert que se encuentra en la Tabla \ref{tab:escalaLikert} utilizada tiene un rango de 1 a 5, acorde al grado de satisfacción del usuario:
+
+\input{../03Tables/03Chapter/C3.tableLikertScale}
+
+Para la obtención de un resultado de acuerdo con SUS, se debe seguir los siguientes pasos:
+
+\begin{enumerate}
+    \item Sumar los puntajes de las preguntas pares e impares.
+    \item Al resultado de la suma de las preguntas impares se le debe restar 5.
+    \item El resultado de la suma de las preguntas pares debe ser restado a 25.
+    \item Se suma los últimos valores obtenidos y se multiplica por 2,5.
+    \item Si el resultado final es mayor a 67, significa que el sistema es usable.
+\end{enumerate}
+
+\subsection{Resultados de Pruebas Funcionales}
+A través de los casos de prueba se logró validar que las funcionalidades principales del sistema cumplan con los requisitos definidos dentro de las Historias de Usuario. Cada caso de prueba permitió evaluar los comportamientos que presente el sistema ante los distintos eventos o acciones que pueden ejecutarse por parte del usuario.
+
+Como ejemplo se tomó el caso de prueba CP-03 donde se validó la funcionalidad de probar una consulta SQL con la sentencia \texttt{INSERT} válida e inválida para poder verificar que los resultados obtenidos antes ambos escenarios opuestos sean los esperados.
+
+Como se observa en la Figura (Llamar a figura), para una sentencia válida el sistema devuelve su equivalente en lenguaje Cypher, mientras que para un una sentencia inválida se muestra el mensaje de error claro y preciso.
 
 
-\subsubsection{Metodología y Participantes}
-% Para estas pruebas, se contó con la colaboración de un grupo de 5 participantes con perfil técnico, específicamente desarrolladores y estudiantes de ingeniería de software con conocimientos previos en SQL pero con experiencia limitada en bases de datos orientadas a grafos. Se les proporcionó un conjunto de casos de prueba que debían ejecutar utilizando el \textit{middleware}.
+\subsubsection{Resultados de Pruebas de Usabilidad}
+Las pruebas de usabilidad arrojaron resultados positivos en cuanto a la experiencia de los usuarios para interactuar con el sistema. El resumen de resultados de las tareas específicas se indican en la Tabla \ref{tab:tareasEspecificas} evaluadas en base a las métricas definidas previamente. Para un ver los resultados detallados por participante y por tarea, se puede consultar en el \hyperlink{anexoVI}{Anexo VI}.
 
-% Los escenarios evaluados incluyeron:
-% \begin{itemize}
-%     \item Conexión exitosa y fallida a la base de datos.
-%     \item Traducción de sentencias \texttt{SELECT} con filtros \texttt{WHERE}.
-%     \item Traducción de sentencias con \texttt{INNER JOIN} y \texttt{LEFT JOIN}.
-%     \item Ejecución de las consultas traducidas y visualización de resultados.
-%     \item Identificación de errores de sintaxis SQL.
-% \end{itemize}
+\input{../03Tables/03Chapter/C3.tableSpecificTasksResults}
 
-% Comentario: Agregar aquí una tabla detallando los casos de prueba funcionales (ID, Descripción, Resultado Esperado, Resultado Obtenido).
-
-\subsubsection{Resultados Obtenidos}
-% Los resultados de las pruebas funcionales fueron altamente satisfactorios. El 100\% de las sentencias SQL válidas fueron traducidas correctamente a su equivalente en Cypher. En cuanto a la ejecución, el sistema logró recuperar los datos de la base de datos de grafos y presentarlos en los formatos tabular y JSON sin inconsistencias.
-
-% Se detectaron incidencias menores durante las primeras iteraciones, relacionadas principalmente con la sensibilidad a mayúsculas y minúsculas en ciertos identificadores, las cuales fueron corregidas inmediatamente. La Tabla \ref{tab:resultadosFuncionales} resume la tasa de éxito por categoría de prueba.
-
-% Comentario: Insertar aquí una gráfica de barras o pastel mostrando el porcentaje de éxito de las pruebas funcionales.
+A través de estos resultados se pudo determinar una tasa de éxito del 97\%, un tiempo de promedio de 3,14 minutos por tarea, un promedio de 0,43 errores por tarea y una satisfacción de 4,4 sobre 5. Esto se traduce en que los usuarios lograron completar sin mayor dificultad las tareas asignadas y de forma rápida, generando una experiencia positiva al interactuar con el sistema. A pesar de ello, la tarea 2 presentó la mayor cantidad de errores y el tiempo promedio más alto para completarla, lo cual nos indica un área de mejora o tal vez un ajuste en las indicaciones de los pasos.
 
 
-\subsubsection{Metodología y Participantes}
-% El grupo de prueba para la usabilidad estuvo conformado por 5 participantes distintos a los de las pruebas funcionales, seleccionados para representar a usuarios finales que podrían beneficiarse de la herramienta para la migración de consultas. Se les pidió realizar una tarea completa: configurar la conexión, traducir una consulta compleja, ejecutarla y exportar los resultados a CSV.
+\subsubsection{Resultados de Cuestionario SUS}
+Utilizando los datos del participante 3 para el ejemplo, se indicará el cálculo del puntaje SUS:
 
-% Al finalizar la interacción, cada participante completó el cuestionario SUS, que consta de 10 preguntas con una escala de Likert de 1 a 5. Además, se recogieron comentarios cualitativos sobre su experiencia.
+\begin{equation}
+    \begin{aligned}
+        P_i = 4 + 4 + 4 + 4 + 4 = 20
+    \end{aligned}
+\end{equation}
 
-% Comentario: Agregar aquí el formato del cuestionario SUS utilizado o una tabla con las puntuaciones individuales.
+\begin{equation}
+    \begin{aligned}
+        P_p = 3 + 2 + 2 + 2 + 2 = 11
+    \end{aligned}
+\end{equation}
 
-\subsubsection{Análisis de Resultados}
-% El puntaje promedio obtenido en la escala SUS fue de 85 sobre 100, lo que sitúa al \textit{middleware} en la categoría de "Excelente" en términos de usabilidad. Los participantes destacaron la claridad de la interfaz y la utilidad de las sugerencias de corrección de errores.
+\begin{equation}
+    \begin{aligned}
+        SP_i = 20 - 5 = 15
+    \end{aligned}
+\end{equation}
 
-% Entre los comentarios positivos, se resaltó la funcionalidad de autocompletado del historial y la visualización dual de resultados. Como oportunidad de mejora, dos participantes sugirieron aumentar el tamaño de la fuente en el editor de código para mejorar la legibilidad en pantallas pequeñas.
+\begin{equation}
+    \begin{aligned}
+        SP_p = 25 - 11 = 14
+    \end{aligned}
+\end{equation}
 
-% Comentario: Insertar aquí una gráfica comparativa de los puntajes SUS o un diagrama de los aspectos mejor valorados.
+\begin{equation}
+    \begin{aligned}
+        Promedio_{SUS} = (15 + 14) \times 2.5 = 72.5
+    \end{aligned}
+\end{equation}
+
+
+En la Tabla \ref{tab:resultadosSUS} se presenta la puntuación asignada por los encuestados a cada una de las preguntas y el promedio SUS obtenido por cada participante.
+
+\input{../03Tables/03Chapter/C3.tableSUSResults}
+
+El promedio final de la aplicación fue de \textbf{79.5}, lo cual refleja que los usuarios consideran que es un sistema fácil de usar y eficiente para cumplir con las necesidades para la cuales fue desarrollado.
