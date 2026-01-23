@@ -47,6 +47,8 @@
 \RequirePackage{makecell}
 \RequirePackage[table]{xcolor}
 \usepackage{datetime}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 
 \newdateformat{monthyeardate}{%
     \monthname[\THEMONTH] \THEYEAR

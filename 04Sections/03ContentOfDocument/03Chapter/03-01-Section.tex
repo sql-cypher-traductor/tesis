@@ -102,4 +102,40 @@ En la Tabla \ref{tab:resultadosSUS} se presenta la puntuación asignada por los 
 
 \input{../03Tables/03Chapter/C3.tableSUSResults}
 
-El promedio final de la aplicación fue de \textbf{79.5}, lo cual refleja que los usuarios consideran que es un sistema fácil de usar y eficiente para cumplir con las necesidades para la cuales fue desarrollado.
+En la Figura \ref{fig:estadisticasResultadosSUS} se parecia el gráfico representativo solo los resultados de las encuestas realizadas. El promedio final de la aplicación fue de \textbf{79.5}, una puntuación significativa sobre el mínimo considerado. Con esto se evidencia que los usuarios consideran que es un sistema fácil de usar y eficiente para cumplir con las necesidades de uso.
+
+\begin{figure}[H]
+    \centering
+    \caption{Gráfico estadístico de encuesta SUS por participante.}
+    \label{fig:estadisticasResultadosSUS}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=15cm, height=10cm,
+            ybar,
+            bar width=1cm,
+            ymin=0, ymax=100,
+            ylabel={Puntaje SUS},
+            xlabel={Participantes},
+            symbolic x coords={P1, P2, P3, P4, P5, P6, P7, P8, P9, P10},
+            xtick=data,
+            nodes near coords,
+            nodes near coords align={vertical},
+            legend style={legend pos=north east},
+            grid=major,
+            grid style={dashed, gray!30}
+        ]
+
+            \addplot[fill=blue!50] coordinates {
+                (P1, 80) (P2, 87.5) (P3, 72.5) (P4, 85) (P5, 75) (P6, 67.5) (P7, 90) (P8, 77.5) (P9, 72.5) (P10, 87.5)
+            };
+
+            \draw [green!70!black, ultra thick, dashed] 
+                (axis cs:P1, 79.5) -- (axis cs:P10, 79.5) 
+                node [anchor=south west, pos=0.4] {Promedio SUS: 79.5};
+
+            \draw [red, thick] 
+                (axis cs:P1, 68) -- (axis cs:P10, 68) 
+                node [anchor=north west, pos=0.2] {Umbral usabilidad: 68};
+        \end{axis}
+    \end{tikzpicture}
+\end{figure}
