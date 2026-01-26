@@ -71,10 +71,10 @@ Una vez implementada la estructura de modelos y utilizando la biblioteca \texttt
 \end{lstlisting}
 
 
-\subparagraph{Cifrado de contraseñas y manejo de sesiones} 
+\subparagraph{Cifrado de contraseñas y manejo de sesiones:} 
 En el servicio de autenticación, se implementó el algoritmo Bcrypt para hashear la contraseña del usuario previo a ser almacenada.
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Python]
     def get_password_hash(password):
         pwd_bytes = password.encode("utf-8")
         salt = bcrypt.gensalt()
@@ -84,7 +84,7 @@ En el servicio de autenticación, se implementó el algoritmo Bcrypt para hashea
 
 Por su parte, para el manejo de sesiones se utilizó JWT, mismo que genera tokens que contiene información del usuario cifrada y un tiempo de expiración. El tiempo de caducidad del token está configurado para 15 minutos y la firma para generación de tokens se obtiene de las variables de entorno con lo cual se refuerza la seguridad del software.
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Python]
     def create_access_token(data: dict, expires_delta: Optional[timedelta]):
         to_encode = data.copy()
         if expires_delta:
@@ -99,56 +99,115 @@ Por su parte, para el manejo de sesiones se utilizó JWT, mismo que genera token
 
 Para el almacenamiento de conexiones a bases de datos, se utilizó el sistema Fernet, que se encargará de encriptar las contraseñas de las BD previo a ser almacenadas.
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Python]
     def encrypt_credential(raw_password: str) -> str:
         return cipher_suite.encrypt(raw_password.encode()).decode()
 \end{lstlisting}
 
 
-\subparagraph{Especificación de Endpoints}
+\subparagraph{Especificación de Endpoints:}
 En este sprint, se implementaron las peticiones HTTP asociadas a las funcionalidades de autenticación y conexión a base de datos. En las Tablas \ref{tab:endpointsAuth} y \ref{tab:endpointsConnections}  se detallan cada uno de los endpoints desarrollados y las funciones que cumplen.
 
 \input{../03Tables/02Chapter/C2.tableEndpointsAuth}
 \input{../03Tables/02Chapter/C2.tableEndpointsConnection.tex}
 
-\paragraph{Frontend:}
-Para complementar la construcción del servicio de autenticación se contruyeron las pantallas respectivas para el registro e inicio de sesión.  
-Aquí se construyeron las pantallas respectivas para registro y login. Se utilizó la librería Zod para validar los campos desde el lado del cliente asegurando que cumplan los formatos correctos previo a la integración con el backend. La gestión del estado de autenticación se maneja con Zustand, almacenando el token de acceso y la información del usuario de forma segura.
+\paragraph{Frontend}
+Para la construcción del servicio de autenticación, se construyeron las pantallas de registro de usuario, inicio de sesión y el modal para agregar una nueva conexión a una base de datos SQL Server o Neo4j, replicando los prototipos realizados en Figma.
+
+\subparagraph{Configuración de la API:}
+En el archivo \texttt{api.ts} se configuró un cliente Axios que permita integrar el frontend con los endpoints del backend. Cabe señalar que, a través de un interceptor de solicitudes, se agrega un token de autorización que brinda acceso a todas las peticiones que requieran autenticación previa de aquí en adelante.
+
+\begin{lstlisting}[language=Python]
+    const api = axios.create({
+        baseURL: process.env.NEXT_PUBLIC_API_URL,
+    });
+
+    api.interceptors.request.use((config) => {
+        if (typeof window !== "undefined") {
+            const token = localStorage.getItem("token");
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return config;
+    });
+    export default api;
+\end{lstlisting}
+
+\subparagraph{Página de Registro e Inicio de Sesión: }
+En el código que se encuentra a continuación, se puede apreciar un fragmento de la implementación de las páginas de login y registro de usuario, donde se utilizaron bibliotecas como \texttt{zod} y \texttt{react-hook-form} para la creación del formulario y la validación de campos como el nombre completo, email y contraseña.
 
 \begin{lstlisting}
-    "use client";
-    import { useAuthStore } from "@/store/useAuthStore";
-    // ...
+    const registerSchema = z
+        .object({
+            fullName: z.string().min(2, "Mínimo 2 caracteres"),
+            email: z.email("Email inválido"),
+            password: z.string().min(6, "Mínimo 6 caracteres"),
+            confirmPassword: z.string(),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+            message: "Las contraseñas no coinciden",
+            path: ["confirmPassword"],
+        });
 
-    export default function LoginPage() {
-    const { login, isLoading, error } = useAuthStore();
-    // ...
-    const onSubmit = async (values: LoginData) => {
-        await login(values);
-    };
-    // ...
-    }
+    export default function RegisterPage() {
+        const router = useRouter();
+        const [isLoading, setIsLoading] = useState(false);
+        const form = useForm<z.infer<typeof registerSchema>>({
+            resolver: zodResolver(registerSchema),
+            defaultValues: {
+                fullName: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+            },
+        });
 \end{lstlisting}
 
-Además, se implementó un modal en la interfaz de usuario donde los usuarios deben ingresar los detalles de la conexión (host, puerto, usuario, contraseña, etc.). Este modal está integrado directamente con la lógica de configuración de conexiones implementada en el backend y maneja una basta retroalimentación que indica al usuario de forma amigable si existen o no problemas de conexión.
+La función \texttt{onSubmit} se encarga de enlazar el formulario con el endpoint de registro o de inicio de sesión e indicar si la acción se ha podido ejecutar de forma exitosa o hubo algún inconveniente.
 
-\begin{lstlisting}  
-    "use client";
-    import { useConnectionStore } from "@/store/useConnectionStore";
-    // ...
-
-    export function ConnectionModal() {
-    const { createConnection, loading } = useConnectionStore();
-    // ...
-    const onSubmit = async (data: ConnectionFormData) => {
-        const success = await createConnection(data);
-        if (success) {
-        // ...
+\begin{lstlisting}
+    async function onSubmit(values: z.infer<typeof registerSchema>) {
+        setIsLoading(true);
+        try {
+            await api.post("/auth/register", {
+                email: values.email,
+                password: values.password,
+                full_name: values.fullName,
+            });
+            // ...
+            router.push("/login");
+        } catch (err) {
+            const error = err as AxiosError<{ detail: string }>;
+            const msg = error.response?.data?.detail || "Error al registrarse";
+            toast.error("Error", { description: msg });
+        } finally {
+            setIsLoading(false);
         }
-    };
-    // ...
     }
 \end{lstlisting}
+
+\subparagraph{Almacenamiento de JWT:}
+A pesar de la similitud en el proceso de creación del formulario, la validación de campos en la ventana de login se hizo con OAuth2 para garantizar la seguridad del usuario. Una vez que el usuario ingresa al sistema, se genera un token JWT que será almacenado en el \texttt{localStorage} para ser utilizado en las solicitudes HTTP próximas.
+
+En la figura \ref{fig:paginaLogin} se aprecia la pantalla de inicio de sesión que aplica un split vertical con el logo de la aplicación en la parte izquierda y en la derecha, el formulario de logueo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../02Figures/02Chapter/C2.LoginPage}
+    \caption{Página de Inicio de Sesión.}
+    \label{fig:paginaLogin}
+\end{figure}
+
+\subparagraph{Modal de Conexiones:}
+El modal de conexiones permite almacenar conexiones a bases de datos SQL Server o Neo4j. En la Figura \ref{fig:modalConexiones} se visualiza el modal con los campos correspondientes como motor, host, puerto, usuario o base de datos con la cual se desea interactuar. Esta configuración será de ayuda durante la traducción y ejecución de consultas SQL a Cypher.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../02Figures/02Chapter/C2.ConnectionsModal}
+    \caption{Modal para configurar una nueva conexión a base de datos.}
+    \label{fig:modalConexiones}
+\end{figure}
 
 \subsubsection{Sprint 1 Review}
 Al finalizar el Sprint 1, se completaron con éxito las tareas planificadas en el backlog. El sistema ahora cuenta con un servicio de autenticación funcional que permite a los usuarios registrarse e iniciar sesión de forma segura. Asimismo, la aplicación brinda la facilidad para configurar y almacenar las credenciales de sus bases de datos SQL Server y Neo4j. A través de las pruebas unitarias y de integración realizadas se asegura la calidad y estabilidad de la implementación en esta primera iteración.
@@ -156,7 +215,7 @@ Al finalizar el Sprint 1, se completaron con éxito las tareas planificadas en e
 \subsubsection{Sprint 1 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La implementación de los flujos de autenticación y conexión se realizó sin mayores contratiempos. La separación de responsabilidades entre el frontend y el backend, junto con el uso de FastAPI y Next.js, demostró ser una arquitectura robusta y escalable. La gestión de estado con Zustand en el frontend simplificó el manejo de la información del usuario y las conexiones.
+    La implementación de los flujos de autenticación y conexión se realizó sin mayores contratiempos. La separación de responsabilidades entre el frontend y el backend, junto con el uso de FastAPI y NextJS, permitió sentar una estructura de código robusta y escalable. El uso de bibliotecas como \texttt{Pydantic} y \texttt{Zod} facilitó el uso y validación de los datos.
     
     \item \textbf{¿Qué se puede mejorar?} \newline
     Aunque la funcionalidad principal está implementada, se podría mejorar la experiencia de usuario añadiendo retroalimentación más detallada durante los procesos de conexión. Para el backend, se podría considerar la implementación de un sistema de refresco de tokens (refresh tokens) para mejorar la seguridad y la persistencia de la sesión del usuario. Además, sería beneficioso ampliar la cobertura de las pruebas para incluir más casos de borde.
@@ -166,77 +225,68 @@ Al finalizar el Sprint 1, se completaron con éxito las tareas planificadas en e
 
 \subsection{Sprint 2}
 \subsubsection{Sprint 2 Planning}
-El objetivo de este sprint fue implementar la funcionalidad principal del traductor, permitiendo a los usuarios convertir sentencias \texttt{SELECT} estándar de SQL a su equivalente en Cypher. Adicionalmente, se buscó habilitar la ejecución de estas consultas traducidas en la base de datos Neo4j y visualizar los resultados obtenidos.
+Para la segunda iteración del proyecto, se establecieron dos objetivos principales: la implementación básica del servicio de traducción, el cual recibe una sentencia de lectura de datos utilizando la estructura \texttt{SELECT} básica y la funcionalidad para ejecutar las traducciones obtenidas, dentro de una base de datos Neoj4 que permitirá validar los resultados de traducción y ejecución.
 
 \subsubsection{Sprint 2 Backlog}
-La Tabla \ref{tab:sprintBacklog2} detalla las tareas del Sprint 2.
+En la Tabla \ref{tab:sprintBacklog2} se indican las tareas definidas para el Sprint 2.
 
 \input{../03Tables/02Chapter/C2.tableSprintBacklog2}
 
 
 \subsubsection{Ejecución del Sprint 2}
-El trabajo de este sprint se centró en dos áreas principales: la traducción de sentencias \texttt{SELECT} y la ejecución y visualización de las consultas resultantes.
+\paragraph{Backend}
+\subparagraph{Implementación del Traductor:}
+La implementación de la función de traducción SQL a Cypher fue realizada utilizando la biblioteca \texttt{sqlglot}, una herramienta creada para el parseo de consultas SQL. Una vez analizada una sentencia específica, se identifica el tipo de operación para invocar un manejador, mismo que estará encargado de la traducción. El fragmento de código que se observa a continuación, indica cómo se construye una sentencia de lectura de datos en Cypher a partir de una operación \texttt{SELECT} básica.
 
-\paragraph{Traducción de Consultas \texttt{SELECT}}
-\subparagraph{Backend:}
-Se utilizó ANTLR (Another Tool for Language Recognition) para construir el parser del dialecto SQL soportado. Se definieron las reglas léxicas y sintácticas en un archivo de gramática (\texttt{SQLSimple.g4}) para reconocer la estructura de una sentencia \texttt{SELECT}, incluyendo cláusulas como \texttt{WHERE} y \texttt{ORDER BY}, y palabras clave como \texttt{DISTINCT} y \texttt{LIMIT}.
+\begin{lstlisting}[language=Python]
+    class SelectHandler(BaseHandler):
+        def handle(self, expression: exp.Select) -> str:
+            match_clause = self._build_match(expression)
+            where_clause = self.build_where(expression)
+            return_clause = self._build_return(expression)
 
-A partir de esta gramática, se generaron las clases del lexer, parser y un visitor. Se implementó una clase \texttt{Visitor} personalizada que recorre el árbol sintáctico abstracto (AST) generado por el parser y construye la consulta Cypher equivalente. Finalmente, se expuso esta lógica a través de un endpoint \texttt{/translate}.
+            order_clause = self._build_order_by(expression)
+            limit_clause = self._build_limit(expression)
+
+            parts = [match_clause, where_clause, return_clause, order_clause, limit_clause]
+            return " ".join([p for p in parts if p]).strip()
+\end{lstlisting}
+
+\subparagraph{Implementación de ejecución de consultas:}
+Con ayuda de la biblioteca \texttt{neo4j}, se implementó el ejecutor de consultas Cypher. Una vez que se ha traducido una consulta SQL, dicho resultado se ejecuta directamente hacia la base de datos Neo4j. El siguiente fragmento de código indica el proceso para interactuar con una base de datos en Neo4j. Primero, se crea una conexión hacia la base de datos objetivo, se traduce la consulta y se procesa la respuesta, devolviendo el resultado de la ejecución para ser utilizado en el backend.
+
+\begin{lstlisting}[language=Python]
+    class Neo4jExecutor:
+        def execute(self, query: str) -> Dict[str, Any]:
+            nodes = {}
+            links = []
+            with self.driver.session() as session:
+                result = session.run(query)
+                for record in result:
+                    for key, value in record.items():
+                        if hasattr(value, "labels"):
+                            node_id = str(value.element_id or value.id)
+                            if node_id not in nodes:
+                                nodes[node_id] = {"id": node_id, "labels": list(value.labels), "properties": dict(value._properties)}
+                        elif hasattr(value, "start_node"):  # Relación
+                            links.append({"source": str(value.start_node.element_id or value.start_node.id), "target": str(value.end_node.element_id or value.end_node.id), "type": value.type, "properties": dict(value._properties)})
+            return {"nodes": list(nodes.values()), "links": links}
+\end{lstlisting}
+
+
+\subparagraph{Resumen de Endpoints:} En la Tabla \ref{tab:endpointsTraduccion}, se presentan los endpoints generados para las funciones de traducción y ejecución de consultas.
+
+\input{../03Tables/02Chapter/C2.tableEndpointsTranslator}
+
+\paragraph{Frontend}
+Como interfaz de usuario, se desarrolló una pantalla que incluye el editor de código y la visualización de resultados. Esta ventana fue dividida en tres paneles: El panel central que contiene el editor de código donde ingresará las sentencias SQL y se visualizará la traducción en Cypher. Además se agregó unos tabs que permitirá observar los resultados de la ejecución en los formatos de tabla, grafos y JSON. Esta estructura se puede ver en la Figura \ref{fig:pantallaTraduccion}
 
 \begin{figure}[H]
     \centering
-    \begin{lstlisting}[language=Python]
-# app/core/parser/visitor.py
-class Visitor(SQLSimpleVisitor):
-    def visitSelect_statement(self, ctx: SQLSimpleParser.Select_statementContext):
-        # ... Logica de traduccion ...
-        cypher_query = f"MATCH {match_clause} RETURN {return_clause}"
-        # ...
-        return cypher_query
-    \end{lstlisting}
-    \caption{Implementación del Visitor para la traducción.}
-    \label{fig:sprint2_visitor}
+    \includegraphics[width=0.9\textwidth]{../02Figures/02Chapter/C2.TranslationPage}
+    \caption{Pantalla de Traducción y Ejecución de Consultas.}
+    \label{fig:pantallaTraduccion}
 \end{figure}
-
-\subparagraph{Frontend:}
-Se desarrolló la pantalla principal de traducción, que consta de dos editores de código: uno para ingresar la consulta SQL (\texttt{SQLEditor}) y otro para mostrar la consulta Cypher resultante (\texttt{CypherViewer}). Se utilizó la librería CodeMirror para crear estos editores, proporcionando resaltado de sintaxis y una mejor experiencia de usuario. La comunicación con el endpoint de traducción del backend se gestionó a través de un store de Zustand (\texttt{useTranslateStore}).
-
-\begin{figure}[H]
-    \centering
-    \begin{lstlisting}
-// src/app/dashboard/translate/page.tsx
-"use client";
-import { SQLEditor } from "@/components/translator/SQLEditor";
-import { CypherViewer } from "@/components/translator/CypherViewer";
-import { useTranslateStore } from "@/store/useTranslateStore";
-
-export default function TranslatePage() {
-  const { sqlQuery, setSqlQuery, translatedQuery, translateQuery, loading } =
-    useTranslateStore();
-
-  const handleTranslate = async () => {
-    await translateQuery(sqlQuery);
-  };
-
-  return (
-    // ...
-    <SQLEditor value={sqlQuery} onChange={setSqlQuery} />
-    <button onClick={handleTranslate}>Translate</button>
-    <CypherViewer value={translatedQuery} />
-    // ...
-  );
-}
-    \end{lstlisting}
-    \caption{Componente de la página de traducción.}
-    \label{fig:sprint2_translate_page}
-\end{figure}
-
-\paragraph{Ejecución y Visualización de Consultas}
-\subparagraph{Backend:}
-Se crearon los endpoints necesarios para ejecutar las consultas Cypher en la base de datos Neo4j configurada por el usuario y para exportar los resultados. El servicio de ejecución se conecta a Neo4j, ejecuta la consulta y devuelve los resultados en formato JSON.
-
-\subparagraph{Frontend:}
-Se implementó un panel de resultados que muestra los datos obtenidos de la ejecución de la consulta en una tabla. Este panel también incluye la funcionalidad para exportar los resultados en formatos como CSV y JSON, permitiendo al usuario trabajar con los datos fuera de la aplicación.
 
 \subsubsection{Sprint 2 Review}
 Al concluir el Sprint 2, se logró el objetivo de implementar la traducción y ejecución de consultas \texttt{SELECT} simples. Los usuarios ahora pueden escribir una consulta SQL, obtener su equivalente en Cypher y ejecutarla contra su base de datos Neo4j, todo desde una única interfaz. La visualización de resultados en formato de tabla y las opciones de exportación añaden un valor significativo a la herramienta.
@@ -254,23 +304,19 @@ Al concluir el Sprint 2, se logró el objetivo de implementar la traducción y e
 
 \subsection{Sprint 3}
 \subsubsection{Sprint 3 Planning}
-El objetivo de este sprint fue ampliar significativamente las capacidades del traductor SQL a Cypher. Se planificó extender la gramática ANTLR para soportar funcionalidades más avanzadas de SQL, incluyendo funciones de agregación (\texttt{COUNT}, \texttt{SUM}, etc.), agrupaciones (\texttt{GROUP BY}, \texttt{HAVING}), relaciones entre tablas (\texttt{JOIN}) y operaciones de manipulación de datos (\texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}).
+El sprint 3 tiene como enfoque principal la extensión de la gramática SQL donde se incluirá el manejo de relaciones a través de \texttt{JOINs} y el resto de operaciones DML, es decir, \texttt{INSERT}, \texttt{UPDATE} y \texttt{DELETE}.
 
 \subsubsection{Sprint 3 Backlog}
-La Tabla \ref{tab:sprintBacklog3} detalla las tareas del Sprint 3.
+Las tareas establecidas para el Sprint 3 están descritas en la Tabla \ref{tab:sprintBacklog3}.
 
 \input{../03Tables/02Chapter/C2.tableSprintBacklog3}
 
 
 \subsubsection{Ejecución del Sprint 3}
-El desarrollo se enfocó exclusivamente en el backend, específicamente en la mejora del parser y el visitor de ANTLR para dar soporte a las nuevas características del lenguaje SQL.
+Este sprint se centró exclusiva en la extensión de las operaciones SQL que deben ser soportadas por el traductor.
 
-\paragraph{Extensión de la Gramática y Lógica de Traducción}
-\subparagraph{Funciones de Agregación y Agrupación:}
-Se modificó el archivo de gramática \texttt{SQLSimple.g4} para incluir reglas que reconocen funciones de agregación y las cláusulas \texttt{GROUP BY} y \texttt{HAVING}. La clase \texttt{Visitor} fue actualizada para traducir estas construcciones a sus equivalentes en Cypher. Por ejemplo, una función \texttt{COUNT(columna)} se traduce a \texttt{count(n.columna)} y la cláusula \texttt{GROUP BY} se mapea a la cláusula \texttt{WITH} en Cypher para agrupar los resultados.
+\paragraph{Implementación de relaciones}
 
-\subparagraph{Traducción de Relaciones (JOINs):}
-Se añadieron reglas a la gramática para los operadores \texttt{INNER JOIN}, \texttt{LEFT JOIN} y \texttt{RIGHT JOIN}. La lógica en el \texttt{Visitor} se extendió para interpretar estas uniones y generar las cláusulas \texttt{MATCH} correspondientes en Cypher que representan las relaciones entre nodos. Por ejemplo, un \texttt{INNER JOIN} entre dos tablas se traduce a un patrón \texttt{MATCH} que conecta dos tipos de nodos.
 
 \subparagraph{Traducción de DML (INSERT, UPDATE, DELETE):}
 Finalmente, se extendió la gramática para soportar las sentencias de manipulación de datos.
