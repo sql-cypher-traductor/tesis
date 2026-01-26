@@ -1,6 +1,6 @@
 \begin{longtable}[c]{|c|l|m{0.4\textwidth}|}
-    \caption{Endpoints de gestión de conexiones}
-    \label{tab:endpointsConnections} \\
+    \caption{Endpoints asociados a restablecimiento de contraseña.}
+    \label{tab:endpointsPerfil} \\
     
      \hline
     \rowcolor{gray!50}
@@ -19,11 +19,9 @@
     
     \endlastfoot
 
-    GET & \texttt{/connections} & Indica todas las conexiones del usuario. \\
+    PUT & \texttt{/users/me} & Permite actualizar el perfil al usuario autenticado. \\
     \hline
-    POST & \texttt{/connections} & Agrega una nueva conexión. \\
-    \hline
-    POST & \texttt{/connections/conn-id/test} & Permite realizar pruebas de conexión. \\
+    POST & \texttt{/users/me/password} & Permite a un usuario autenticado cambiar su contraseña. \\
     \hline
     
 \end{longtable}

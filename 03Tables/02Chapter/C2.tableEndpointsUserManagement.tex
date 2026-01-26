@@ -1,6 +1,6 @@
 \begin{longtable}[c]{|c|l|m{0.4\textwidth}|}
-    \caption{Endpoints de gestión de conexiones}
-    \label{tab:endpointsConnections} \\
+    \caption{Endpoints asociados a restablecimiento de contraseña.}
+    \label{tab:endpointsGestionUsuarios} \\
     
      \hline
     \rowcolor{gray!50}
@@ -19,11 +19,13 @@
     
     \endlastfoot
 
-    GET & \texttt{/connections} & Indica todas las conexiones del usuario. \\
+    GET & \texttt{/users} & Permite al administrador gestionar los usuarios registrados. \\
     \hline
-    POST & \texttt{/connections} & Agrega una nueva conexión. \\
+    POST & \texttt{/users} & Permite al administrador crear un nuevo usuario. \\
     \hline
-    POST & \texttt{/connections/conn-id/test} & Permite realizar pruebas de conexión. \\
+    PUT & \texttt{/users/user-id} & Permite al administrador modificar los datos o el rol de un usuario registrado. \\
+    \hline
+    DELETE & \texttt{/users/user-id} & Permite al administrador eliminar un usuario registrado. \\
     \hline
     
 \end{longtable}

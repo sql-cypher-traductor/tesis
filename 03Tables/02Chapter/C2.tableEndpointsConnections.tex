@@ -1,6 +1,6 @@
 \begin{longtable}[c]{|c|l|m{0.4\textwidth}|}
     \caption{Endpoints de gestión de conexiones}
-    \label{tab:endpointsConnections} \\
+    \label{tab:endpointsConexiones} \\
     
      \hline
     \rowcolor{gray!50}
@@ -19,11 +19,11 @@
     
     \endlastfoot
 
-    GET & \texttt{/connections} & Indica todas las conexiones del usuario. \\
+    GET & \texttt{/connections/conn-id} & Indica los detalles de una conexión específica. \\
     \hline
-    POST & \texttt{/connections} & Agrega una nueva conexión. \\
+    PUT & \texttt{/connections/conn-id} & Actualiza una conexión existente. \\
     \hline
-    POST & \texttt{/connections/conn-id/test} & Permite realizar pruebas de conexión. \\
+    DELETE & \texttt{/connections/conn-id} & Elimina una conexión \\
     \hline
     
 \end{longtable}

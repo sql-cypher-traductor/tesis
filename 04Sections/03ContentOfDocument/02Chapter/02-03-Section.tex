@@ -289,15 +289,15 @@ Como interfaz de usuario, se desarrolló una pantalla que incluye el editor de c
 \end{figure}
 
 \subsubsection{Sprint 2 Review}
-Al concluir el Sprint 2, se logró el objetivo de implementar la traducción y ejecución de consultas \texttt{SELECT} simples. Los usuarios ahora pueden escribir una consulta SQL, obtener su equivalente en Cypher y ejecutarla contra su base de datos Neo4j, todo desde una única interfaz. La visualización de resultados en formato de tabla y las opciones de exportación añaden un valor significativo a la herramienta.
+Al concluir el Sprint 2, se logró implementar la ttraducción de sentencias \texttt{SELECT} simples y su ejecución en la base de datos correspondiente. Con esto, se construyó la base que facilita a los usuarios la interacción con sentencias Cypher sin la necesidad de aprender este lenguaje desde cero. Además la visualización y exportación de resultados en distintos formatos mejora la experiencia del usuario con el \textit{middleware}.
 
 \subsubsection{Sprint 2 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La integración de ANTLR para el parsing de SQL fue un éxito y sentó una base sólida para futuras extensiones de la gramática. La arquitectura del frontend, utilizando componentes reutilizables y un store centralizado, facilitó el desarrollo de una interfaz de usuario interactiva y cohesiva.
+    El uso de la biblioteca \texttt{sqlglot} durante el proceso de análisis y descomposición de sentencias SQL resultó eficiente y fácil comparado con otras herramientas como ANTLR4. El uso de componentes reutilizables en el frontend ayudó a la construcción rápida pero estructurada de la interfaz de usuario de para las funcionalidades de traducción y ejecución.
     
     \item \textbf{¿Qué se puede mejorar?} \newline
-    El manejo de errores en la traducción puede ser más robusto. Actualmente, si una consulta SQL no es válida, el sistema podría no proporcionar una retroalimentación clara al usuario. Se debería mejorar el visitor de ANTLR para capturar y reportar errores de sintaxis de manera más efectiva. Además, la visualización de resultados podría enriquecerse para incluir una vista de grafo, lo cual sería más intuitivo para una base de datos como Neo4j.
+    Se debe extender la gramática SQL que incluya más funciones y tipos de sentencias para obtener un traductor más versátil. Además, se requiere una retroalimentación más detallada con respecto a errores de traducción o ejecución que guie con precisión a los desarrolladores en la corrección de sus consultas.
     
 \end{itemize}
 
@@ -313,52 +313,80 @@ Las tareas establecidas para el Sprint 3 están descritas en la Tabla \ref{tab:s
 
 
 \subsubsection{Ejecución del Sprint 3}
-Este sprint se centró exclusiva en la extensión de las operaciones SQL que deben ser soportadas por el traductor.
+Este sprint se centró exclusivamente en la extensión de las operaciones SQL que deben ser soportadas por el traductor.
 
 \paragraph{Implementación de relaciones}
+Dado que se estableció una base sólida con respecto a la traducción de sentencias \texttt{SELECT} durante el sprint anterior, se continuó con la extensión de su gramática especialmente al manejo de relaciones que se dan mediante el uso de \texttt{JOINs}. Para ello, se modificó el método que construye la cláusula \texttt{MATCH} con la cual se busca la tabla principal junto a su alias para transformarla en una etiqueta de nodo, luego se busca todos los JOINS que incluyan la sentencia y en caso que sea \texttt{LEFT JOIN} se utilizará \texttt{OPTIONAL MATCH}, de lo contrario para \texttt{INNER JOIN} se empleará solo \texttt{MATCH}. Posteriormente, se representa la relación apuntando al nodo con una etiqueta distinta que será su equivalente a la tabla secundaria. El siguiente fragmento de código indica el proceso de traducción de sentencias \texttt{SELECT}  que incluyen relaciones.
 
+\begin{lstlisting}[language=Python]
+    def _build_match_and_joins(self, expression: exp.Select) -> str:
+        from_node = expression.find(exp.From)
+        if not from_node:
+            raise TranslationError("SELECT requiere una cláusula FROM.")
 
-\subparagraph{Traducción de DML (INSERT, UPDATE, DELETE):}
-Finalmente, se extendió la gramática para soportar las sentencias de manipulación de datos.
+        main_table_exp = None
+        if from_node.expressions:
+            main_table_exp = from_node.expressions[0]
+        elif from_node.this:
+            main_table_exp = from_node.this
+        if not main_table_exp:
+            raise TranslationError("No se pudo detectar la tabla en la cláusula FROM.")
+
+        main_table = self.get_table_name(main_table_exp)
+        alias_candidate = getattr(main_table_exp, "alias", None)
+        main_alias = alias_candidate or "n"
+
+        if main_alias == main_table:
+            main_alias = "n"
+
+        match_parts = [f"MATCH ({main_alias}:{main_table})"]
+
+        for join in expression.find_all(exp.Join):
+            kind = join.kind or "INNER"
+            target_exp = join.this
+            target_name = self.get_table_name(target_exp)
+
+            target_alias_candidate = getattr(target_exp, "alias", None)
+            target_alias = target_alias_candidate or (
+                target_name[0] if target_name else "t"
+            )
+            rel_name = f"RELATED_TO_{target_name.upper()}"
+            prefix = "OPTIONAL MATCH" if "LEFT" in kind or "RIGHT" in kind else "MATCH"
+            pattern = (
+                f"{prefix} ({main_alias})-[:{rel_name}]->({target_alias}:{target_name})"
+            )
+            match_parts.append(pattern)
+
+        return " ".join(match_parts)
+\end{lstlisting}
+
+\paragraph{Traducción de INSERT, UPDATE y DELETE}
+Una vez extendida la grámatica de \texttt{SELECT}, se implementaron las reglas de mapeo para el resto de operaciones de manipulación de datos. A continuación se indican los equivalentes en Cypher para cada tipo de operaciones:
 \begin{itemize}
-    \item \texttt{INSERT INTO}: Se traduce a una sentencia \texttt{CREATE} en Cypher para crear un nuevo nodo con las propiedades especificadas.
-    \item \texttt{UPDATE}: Se mapea a una combinación de \texttt{MATCH} y \texttt{SET} para encontrar los nodos a actualizar y modificar sus propiedades.
-    \item \texttt{DELETE}: Se convierte en una sentencia \texttt{MATCH} seguida de \texttt{DETACH DELETE} para eliminar los nodos y sus relaciones asociadas.
+    \item La cláusula \texttt{INSERT INTO} se traduce a una sentencia Cypher bajo la siguiente estructura: \texttt{CREATE (n:Etiqueta {prop: 'valor'})}. Esta sentencia le ayudará a construir un nuevo nodo con la etiqueta y propiedades correspondientes.
+    \item La sentencia \texttt{UPDATE} utiliza la cláusula \texttt{MATCH} que seleccionará el nodo a ser modificado y \texttt{SET} que actualizará la propiedad indicada.
+    \item Por último, \texttt{DELETE} también utiliza \texttt{MATCH} para obtener el nodo y \texttt{DELETE} para eliminar los nodos. En caso de que el nodo disponga de asociaciones se utilizará \texttt{DETACH DELETE}.
 \end{itemize}
+
+En la Figura \ref{fig:crudPruebas}, se aprecia las pruebas realizadas al endpoint de traducciones utilizando la operación UPDATE para el ejemplo. Aquí se aprecia tanto la consulta SQL como su equivalente en Cypher y el dialecto utilizado. Dado que se está trabajando con SQL Server, el dialecto seleccionado es \textbf{tsql}.
 
 \begin{figure}[H]
     \centering
-    \begin{lstlisting}[language=Python]
-# app/core/parser/visitor.py
-class Visitor(SQLSimpleVisitor):
-    # ... (metodos existentes) ...
-
-    def visitInsert_statement(self, ctx: SQLSimpleParser.Insert_statementContext):
-        # Logica para traducir INSERT a CREATE
-        return "CREATE (n:Label {key: 'value'})"
-
-    def visitUpdate_statement(self, ctx: SQLSimpleParser.Update_statementContext):
-        # Logica para traducir UPDATE a MATCH y SET
-        return "MATCH (n:Label WHERE n.id = 1) SET n.property = 'new_value'"
-
-    def visitDelete_statement(self, ctx: SQLSimpleParser.Delete_statementContext):
-        # Logica para traducir DELETE a MATCH y DETACH DELETE
-        return "MATCH (n:Label WHERE n.id = 1) DETACH DELETE n"
-    \end{lstlisting}
-    \caption{Nuevos métodos en el Visitor para DML.}
-    \label{fig:sprint3_dml_visitor}
+    \includegraphics[width=0.9\textwidth]{../02Figures/02Chapter/C2.EndpointTests}
+    \caption{Pruebas realizadas al endpoint de traducción.}
+    \label{fig:crudPruebas}
 \end{figure}
 
 \subsubsection{Sprint 3 Review}
-Al finalizar el Sprint 3, el traductor SQL a Cypher es considerablemente más potente. Ahora puede manejar una gama mucho más amplia de consultas SQL, incluyendo agregaciones, agrupaciones, uniones y operaciones de modificación de datos. Esto representa un hito importante en el proyecto, ya que la funcionalidad principal ha alcanzado un alto grado de madurez. Todas las nuevas reglas de traducción fueron validadas mediante pruebas unitarias que cubren diversos escenarios y casos de borde.
+El Sprint 3 permitió ampliar la funcionalidad del traductor con lo cual, ahora abarca la mayoría de funciones y operaciones DML existentes. A través de las pruebas del endpoint se validó que el servicio de traducción sea capaz de soportar las cláusulas implementadas y a su vez que genere la sentencia Cypher correcta. 
 
 \subsubsection{Sprint 3 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La base establecida con ANTLR en el sprint anterior demostró ser muy flexible y extensible, lo que permitió añadir las nuevas funcionalidades de manera estructurada y eficiente. El enfoque de desarrollo guiado por pruebas (TDD) fue clave para asegurar que las nuevas reglas de traducción funcionaran correctamente y no introdujeran regresiones en la funcionalidad existente.
+    La extensión de la gramática no presentó mayor complejidad gracias a la estructura definida durante el sprint 2 además, la modularidad del código dividiendo cada operación SQL en un módulo distinto permitió una implementación fácil separando las responsabilidades de cada uno.
     
     \item \textbf{¿Qué se puede mejorar?} \newline
-    La complejidad del \texttt{Visitor} ha aumentado significativamente. Sería beneficioso refactorizar esta clase para separar la lógica de traducción de las diferentes tipos de sentencias SQL en módulos o clases más pequeñas y especializadas. Esto mejoraría la mantenibilidad y legibilidad del código. Además, la traducción de \texttt{JOIN} complejos con múltiples condiciones podría optimizarse para generar patrones de Cypher más eficientes.
+    A pesar que se logró completar satisfactoriamente con las tareas planificadas para este sprint, se podría mejorar en la implementación de casos más complejos o la inserción de datos en volumen. Con esto se mejoraría aún más la capacidad del traductor.
     
 \end{itemize}
 
@@ -376,74 +404,65 @@ La Tabla \ref{tab:sprintBacklog4} detalla las tareas del Sprint 4.
 \subsubsection{Ejecución del Sprint 4}
 El desarrollo se distribuyó entre el backend y el frontend para implementar el flujo completo de las nuevas funcionalidades de gestión de usuarios.
 
-\paragraph{Actualización de Perfil y Restablecimiento de Contraseña}
-\subparagraph{Backend:}
-Se crearon nuevos endpoints para permitir a los usuarios actualizar su información de perfil (nombre, apellido) y para manejar el proceso de restablecimiento de contraseña. El flujo de restablecimiento de contraseña incluye:
-\begin{enumerate}
-    \item Un endpoint que recibe el correo electrónico del usuario, genera un token de restablecimiento único y lo envía por correo electrónico.
-    \item Un endpoint que valida el token recibido y permite al usuario establecer una nueva contraseña.
-\end{enumerate}
-Se implementó un servicio de correo electrónico para enviar el enlace de restablecimiento.
+\paragraph{Backend}
+Se crearon nuevos DTOs que permitan gestionar y validar los datos necesarios para que los usuarios puedan actualizar su información de perfil y contraseña. A continuación se presenta un extracto del los DTOs creados para estas funcionalidades. 
 
-\begin{figure}[H]
-    \centering
-    \begin{lstlisting}[language=Python]
-# app/api/v1/endpoints/auth.py
-@router.post("/password-recovery/{email}", response_model=Msg)
-def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
-    """
-    Password Recovery
-    """
-    user = auth_service.get_user_by_email(db, email=email)
+\begin{lstlisting}[language=Python]
+    # DTOs para la actualización de perfil y cambio de contraseña
+    class UserUpdateDTO(BaseModel):
+        full_name: str | None = None
+        email: EmailStr | None = None
 
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this email does not exist in the system.",
-        )
-    password_reset_token = password_reset_service.create_token(db, user_id=user.id)
-    email_service.send_reset_password_email(
-        email_to=user.email, username=user.first_name, token=password_reset_token.token
-    )
-    return {"msg": "Password recovery email sent"}
-    \end{lstlisting}
-    \caption{Endpoint para solicitar restablecimiento de contraseña.}
-    \label{fig:sprint4_password_recovery}
-\end{figure}
+    class PasswordChangeDTO(BaseModel):
+        current_password: str
+        new_password: str
+\end{lstlisting}
 
-\subparagraph{Frontend:}
+Para garantizar la seguridad del usuario ante casos imprevistos, se implementó el flujo de restablecimiento de contraseñas donde se solicita el correo electrónico del usuario para generar un token de restablecimiento único, mismo que será enviado por correo electrónico. Una vez que el token es validado, el usuario podrá registrar una nueva contraseña.
+
+\subparagraph{Especificación de endpoints}
+Las Tablas \ref{tab:endpointsPassword}, \ref{tab:endpointsGestionUsuarios} y \ref{tab:endpointsPerfil} indican los endpoints creados dentro de esta iteración.
+
+\input{../03Tables/02Chapter/C2.tableEndpointsPassword}
+\input{../03Tables/02Chapter/C2.tableEndpointsUserManagement.tex}
+\input{../03Tables/02Chapter/C2.tableEndpointsProfile.tex}
+
+\paragraph{Frontend:}
 Se desarrollaron las pantallas correspondientes en el frontend:
 \begin{itemize}
-    \item Una página de "Editar Perfil" donde los usuarios pueden modificar su información.
+    \item Una página de Editar Perfil donde los usuarios pueden modificar su información.
     \item Un formulario para solicitar el correo de restablecimiento de contraseña.
     \item Una página que recibe el token de la URL y permite al usuario ingresar su nueva contraseña.
 \end{itemize}
-Se añadieron las validaciones de formulario necesarias para asegurar, por ejemplo, que la nueva contraseña cumpla con los requisitos de seguridad.
 
-\paragraph{Gestión de Usuarios (Admin)}
-\subparagraph{Backend:}
-Se implementaron endpoints protegidos que solo pueden ser accedidos por usuarios con rol de "administrador". Estos endpoints permiten realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los usuarios del sistema.
+Se añadieron las validaciones de formulario necesarias para asegurar, que la contraseña cumpla con los requisitos de seguridad.
 
-\subparagraph{Frontend:}
-Se creó una nueva sección en el dashboard, visible solo para administradores, que muestra una tabla con todos los usuarios registrados. Desde esta pantalla, un administrador puede ver, editar y eliminar usuarios, así como asignar roles.
+La Figura \ref{fig:recuperarPassword} muestra la pantalla una vez el usuario ha ingresado un email correcto registrado para restablecer su contraseña.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../02Figures/02Chapter/C2.PasswordResetRequest}
+    \caption{Pantalla de envio de enlace de recuperación.}
+    \label{fig:recuperarPassword}
+\end{figure}
 
 \subsubsection{Sprint 4 Review}
-Al finalizar el Sprint 4, la aplicación cuenta con un conjunto completo de herramientas para la gestión de cuentas de usuario. Los usuarios pueden gestionar su propia información y recuperar el acceso a sus cuentas si olvidan la contraseña. Los administradores tienen ahora la capacidad de supervisar y administrar a todos los usuarios del sistema. Estas características mejoran significativamente la usabilidad y la seguridad de la plataforma.
+Al finalizar el Sprint 4, la aplicación dispone de la gestión de cuentas de usuario tanto para el administrador como de forma personal. Los usuarios pueden gestionar su información personal asegurando la integridad de sus datos. De la misma manera, los administradores serán capaces de controlar los fines de uso que las personas den a la aplicación a través de sus cuentas.
 
 \subsubsection{Sprint 4 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La implementación del flujo de restablecimiento de contraseña, que involucra la generación de tokens, el envío de correos electrónicos y la validación, se completó con éxito y funciona de manera robusta. La protección de rutas y endpoints basada en roles se implementó correctamente, asegurando que solo los usuarios autorizados puedan acceder a las funciones de administración.
+    La separación de roles donde los administradores tienen privilegios que permitan utilizar la aplicación para los fines que fue desarrollada. El flujo de restablecimiento de contraseña se pudo implementar adecuadamente, asegurando que los tokens generados para resetear la contraseña sean únicos y temporales.
     
     \item \textbf{¿Qué se puede mejorar?} \newline
-    El sistema de envío de correos electrónicos es funcional, pero podría beneficiarse del uso de plantillas HTML para que los correos sean más atractivos y profesionales. En la gestión de usuarios, se podría añadir una funcionalidad de búsqueda y filtrado para que los administradores puedan encontrar usuarios más fácilmente. La auditoría de acciones de administrador (quién hizo qué y cuándo) sería una adición valiosa para la seguridad y el monitoreo.
+    El uso de autenticación multifactor sería una mejora significativa para aumentar la seguridad de las cuentas de usuario. También, llevar un registro de intentos fallidos de inicio de sesión garantizaría la protección del sistema ante ciberataques.
     
 \end{itemize}
 
 
 \subsection{Sprint 5}
 \subsubsection{Sprint 5 Planning}
-El objetivo de este sprint fue introducir funcionalidades para la gestión y el monitoreo de la actividad en la aplicación. Se planificó implementar la administración de conexiones guardadas, un historial de consultas ejecutadas y un sistema de visualización de logs de actividad.
+El objetivo de este sprint está basado en la gestión y el monitoreo de la actividad en la aplicación. Se planificó implementar la administración de conexiones guardadas, un historial de consultas ejecutadas y un sistema de visualización de logs de actividad.
 
 \subsubsection{Sprint 5 Backlog}
 La Tabla \ref{tab:sprintBacklog5} detalla las tareas del Sprint 5.
@@ -456,61 +475,56 @@ El desarrollo se centró en crear nuevas secciones en el backend y frontend para
 
 \paragraph{Gestión de Conexiones}
 \subparagraph{Backend:}
-Se expandió la funcionalidad de conexiones para permitir operaciones CRUD completas. Se crearon endpoints para que los usuarios puedan listar, actualizar y eliminar sus conexiones a bases de datos guardadas.
+Se expandió la funcionalidad de conexiones para permitir operaciones CRUD completas. Se crearon endpoints para que los usuarios puedan listar, actualizar y eliminar sus conexiones a bases de datos guardadas. La tabla \ref{tab:endpointsConexiones} indica el resto de enpoints creados para completar la gestión de conexiones.
+
+\input{../03Tables/02Chapter/C2.tableEndpointsConnections}
+
 
 \subparagraph{Frontend:}
-Se desarrolló una nueva página en el dashboard que muestra las conexiones guardadas por el usuario en forma de tarjetas. Cada tarjeta muestra los detalles de la conexión y ofrece botones para editarla o eliminarla.
+Se actualizó la página del dashboard que muestra las conexiones guardadas por el usuario en forma de lista. Cada conexión indica los campos como el host, motor, el usuario y acciones para editar, eliminar o probar la conexión. La Figura \ref{fig:dashboardConexiones} muestra la página de gestión de conexiones con las funcionalidades indicadas. Esta página es el dashboard inicial que el usuario observará al iniciar sesión.
 
 \begin{figure}[H]
     \centering
-    \begin{lstlisting}
-// src/app/dashboard/connections/page.tsx
-"use client";
-import { ConnectionCard } from "@/components/connections/ConnectionCard";
-import { useConnectionStore } from "@/store/useConnectionStore";
-// ...
-
-export default function ConnectionsPage() {
-  const { connections, fetchConnections } = useConnectionStore();
-
-  useEffect(() => {
-    fetchConnections();
-  }, [fetchConnections]);
-
-  return (
-    // ...
-    {connections.map((connection) => (
-      <ConnectionCard key={connection.id} connection={connection} />
-    ))}
-    // ...
-  );
-}
-    \end{lstlisting}
+    \includegraphics[width=0.9\textwidth]{../02Figures/02Chapter/C2.ConnectionsPage}
     \caption{Página de gestión de conexiones.}
-    \label{fig:sprint5_connections_page}
+    \label{fig:dashboardConexiones}
 \end{figure}
 
 \paragraph{Historial de Consultas}
 \subparagraph{Backend:}
-Se implementó un mecanismo para guardar cada consulta que un usuario traduce y/o ejecuta. Se creó un nuevo modelo en la base de datos (\texttt{Query}) y un endpoint para que los usuarios puedan recuperar su historial de consultas.
+Se agregó la funcionalidad de historial de consultas que permitirá al usuario poder revisar las consultas que ha traducido o ejecutado previamente. Para ello, en la Figura \ref{fig:endpointHistorial} se utiliza un endpoint \texttt{/translate/history} que devuelve una lista de las consultas traducidas o ejecutadas. Cada consulta SQL incluye su traducción en Cypher, un mensaje de error en caso de que la traducción presente fallos que permitirá identificar erorres de sintaxis en la sentencia original.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../02Figures/02Chapter/C2.HistoryEndpoint}
+    \caption{Endpoint para obtener el historial de consultas.}
+    \label{fig:endpointHistorial}
+\end{figure}
 
 \subparagraph{Frontend:}
-Se desarrolló una pantalla de "Historial" que muestra una lista de las consultas realizadas por el usuario. Cada elemento de la lista muestra la consulta SQL original, la consulta Cypher traducida y la fecha en que se realizó. Esto permite a los usuarios reutilizar consultas anteriores fácilmente.
+Para la inclusión del Historial se decidió implementarlo como un Sidebar que muestra las últimas consultas realizadas por el usuario. Cada elemento de la lista indica el estado de la traducción/ejecución, la consulta SQL original y la fecha en la que fue realizada. Este Sidebar se encuentra dentro de la ventana de traducción y ejecución de consultas, permitiendo seleccionar una consulta previa para ser vargada dentro del editor de código. La Figura \ref{fig:sidebarHistorial} muestra el Sidebar con las consultas almacenadas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{../02Figures/02Chapter/C2.HistorySidebar}
+    \caption{Sidebar de historial de consultas.}
+    \label{fig:sidebarHistorial}
+\end{figure}
 
 \paragraph{Visualización de Logs}
 \subparagraph{Backend:}
-Se configuró un sistema de logging para registrar eventos importantes de la aplicación, como inicios de sesión, errores de traducción o consultas ejecutadas. Se creó un endpoint, accesible solo para administradores, que permite recuperar estos logs.
+Se implementó un sistema de logging que registre acciones ejecutadas dentro de la aplicación, como inicios de sesión, errores de traducción o consultas ejecutadas. Los admnistradores podrán recuperar los logs a través de un endpoint.
 
 \subparagraph{Frontend:}
-Se desarrolló una pantalla de "Logs" en la sección de administración. Esta pantalla muestra los logs en un formato claro y estructurado, permitiendo a los administradores monitorear la salud y el uso del sistema en tiempo real.
+En la sección de administración, se agregó una pantalla para Logs. Haciendo uso de un formato estructurado, se indican las diferentes acciones detectadas que permitirán a los administradores monitorear la salud y el uso del mismo.
 
 \subsubsection{Sprint 5 Review}
-Al finalizar el Sprint 5, la aplicación ha ganado importantes capacidades de gestión y monitoreo. Los usuarios ahora tienen un control total sobre sus conexiones guardadas y pueden acceder a su historial de trabajo. Los administradores disponen de una herramienta de logging para supervisar la actividad del sistema. Estas características hacen que la aplicación sea más robusta, usable y administrable.
+La finalización de esta iteración tuvo como resultados la implementación de funcionalidades como la gestión de conexiones, el historial de consultas y la visualización de logs, mejorando significativamente la experiencia de usuario y el control de acciones dentro del sistema.
 
 \subsubsection{Sprint 5 Retrospective}
 \begin{itemize}
     \item \textbf{¿Qué salió bien?} \newline
-    La implementación de las funcionalidades CRUD para conexiones y el historial de consultas se realizó de manera fluida. La arquitectura existente facilitó la adición de nuevos modelos y endpoints. El sistema de logging proporciona información valiosa para la depuración y el monitoreo.
+    La implementación de la gestión de conexiones y el historial de consultas se realizó de forma eficiente, debido a que ya se contaba con una estructura que facilitaba su implementación.
     
     \item \textbf{¿Qué se puede mejorar?} \newline
     La visualización de logs es funcional, pero podría mejorarse con capacidades de filtrado y búsqueda por nivel de severidad, usuario o rango de fechas. Para el historial de consultas, sería útil añadir una función para "marcar como favorito" las consultas más utilizadas. En la gestión de conexiones, se podría añadir un indicador visual del estado de la conexión (activa/inactiva) en tiempo real.
@@ -532,75 +546,54 @@ El trabajo se concentró en la recopilación de datos en el backend y la present
 
 \paragraph{Obtención y Exposición de Estadísticas}
 \subparagraph{Backend:}
-Se desarrolló un nuevo servicio de analíticas (\texttt{analytics\_service.py}) encargado de calcular diversas métricas del sistema. Este servicio realiza consultas a la base de datos para obtener datos como:
+Se desarrolló un nuevo servicio de estadísticas encargado de calcular diversas métricas del sistema. Este servicio realiza consultas a la base de datos para obtener datos como:
 \begin{itemize}
     \item Número total de usuarios registrados.
     \item Número de consultas traducidas.
     \item Tipos de sentencias SQL más comunes (\texttt{SELECT}, \texttt{INSERT}, etc.).
     \item Actividad de los usuarios a lo largo del tiempo.
 \end{itemize}
-Se creó un endpoint \texttt{/analytics} protegido, accesible solo para administradores, que devuelve estas estadísticas en formato JSON.
+A continuación, se puede observar la implementación del endpoint \texttt{/admin/stats}, accesible solo para administradores, que devuelve estas estadísticas en formato JSON.
 
-\begin{figure}[H]
-    \centering
     \begin{lstlisting}[language=Python]
-# app/api/v1/endpoints/analytics.py
-@router.get("/", response_model=AnalyticsData)
-def get_analytics_data(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_admin),
-) -> Any:
-    """
-    Retrieve analytics data.
-    """
-    analytics_data = analytics_service.get_analytics(db)
-    return analytics_data
+        @router.get("/stats")
+        def get_admin_stats(
+            db: Session = Depends(database.get_db),
+            current_user: User = Depends(deps.get_current_user),
+        ):
+            total_users = db.query(User).count()
+            total_translations = db.query(Translation).count()
+            failed_translations = (
+                db.query(Translation).filter(Translation.error_message is not None).count()
+            )
+            error_rate = 0
+            if total_translations > 0:
+                error_rate = (failed_translations / total_translations) * 100
+
+            active_connections = db.query(DbConnection).count()
+            recent_activity = (
+                db.query(Translation).order_by(Translation.created_at.desc()).limit(5).all()
+            )
+
+            return {
+                "kpis": {
+                    "users": total_users,
+                    "translations": total_translations,
+                    "error_rate": round(error_rate, 2),
+                    "connections": active_connections,
+                },
+                "recent_activity": recent_activity,
+            }
     \end{lstlisting}
-    \caption{Endpoint para obtener datos de analítica.}
-    \label{fig:sprint6_analytics_endpoint}
-\end{figure}
 
 \paragraph{Dashboard de Estadísticas}
 \subparagraph{Frontend:}
-Se desarrolló una nueva página de "Dashboard" en la sección de administración. Esta página consume los datos del endpoint \texttt{/analytics} y los presenta de manera visual utilizando gráficos y tarjetas informativas. Se utilizó una librería de gráficos como Chart.js (a través de un wrapper para React) para crear visualizaciones como:
+Se desarrolló una nueva página de Dashboard en la sección de administración. Esta página consume los datos del endpoint \texttt{/admin/stats} y los presenta de manera visual utilizando gráficos y tarjetas informativas. Se utilizó una librería de gráficos como Chart.js para crear visualizaciones como:
 \begin{itemize}
     \item Tarjetas que muestran el total de usuarios, traducciones y conexiones.
     \item Un gráfico de barras mostrando la distribución de los tipos de sentencias SQL.
     \item Un gráfico de líneas mostrando el número de registros de nuevos usuarios a lo largo del tiempo.
 \end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \begin{lstlisting}
-// src/app/dashboard/admin/page.tsx
-"use client";
-// ... imports para componentes de graficos y store ...
-
-export default function AdminDashboardPage() {
-  // ... Logica para obtener los datos de analitica del store ...
-
-  return (
-    <div>
-      <h1>Admin Dashboard</h1>
-      {/* Tarjetas con estadisticas principales */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card title="Total Users" value={analytics.totalUsers} />
-        <Card title="Total Translations" value={analytics.totalTranslations} />
-        {/* ... mas tarjetas ... */}
-      </div>
-      
-      {/* Graficos */}
-      <div className="mt-8">
-        <BarChart data={analytics.statementTypes} />
-        <LineChart data={analytics.userRegistrations} />
-      </div>
-    </div>
-  );
-}
-    \end{lstlisting}
-    \caption{Componente del dashboard de administración.}
-    \label{fig:sprint6_admin_dashboard}
-\end{figure}
 
 \subsubsection{Sprint 6 Review}
 Al finalizar el Sprint 6 y, con ello, el ciclo de desarrollo principal del proyecto, la aplicación cuenta con un dashboard de analíticas completo y funcional. Los administradores ahora pueden obtener una visión clara y cuantitativa del uso del sistema, lo que les permite tomar decisiones informadas sobre su gestión y evolución. La presentación visual de los datos facilita la comprensión de las tendencias y patrones de uso.
