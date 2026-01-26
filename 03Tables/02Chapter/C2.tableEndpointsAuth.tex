@@ -1,6 +1,6 @@
 \begin{longtable}[c]{|c|l|m{0.4\textwidth}|}
-    \caption{Endpoints de autenticación y gestión de conexiones}
-    \label{tab:endpointsSprint01} \\
+    \caption{Endpoints de autenticación.}
+    \label{tab:endpointsAuth} \\
     
      \hline
     \rowcolor{gray!50}
@@ -19,18 +19,6 @@
     
     \endlastfoot
 
-    GET & \texttt{/connections} & Indica todas las conexiones del usuario. \\
-    \hline
-    GET & \texttt{/connections/conn-id} & Indica los detalles de una conexión específica. \\
-    \hline
-    POST & \texttt{/connections} & Agrega una nueva conexión. \\
-    \hline
-    PUT & \texttt{/connections/conn-id} & Actualiza una conexión existente. \\
-    \hline
-    DELETE & \texttt{/connections/conn-id} & Elimina una conexión \\
-    \hline
-    POST & \texttt{/connections/conn-id/test} & Permite realizar pruebas de conexión. \\
-    \hline
     POST & \texttt{/auth/register} & Permite registrar un nuevo usuario. \\
     \hline
     POST & \texttt{/auth/login} & Permite iniciar sesión y solicita la generación un token JWT. \\

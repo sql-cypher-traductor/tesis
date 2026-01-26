@@ -106,11 +106,13 @@ Para el almacenamiento de conexiones a bases de datos, se utilizó el sistema Fe
 
 
 \subparagraph{Especificación de Endpoints}
-En este sprint, se implementaron las peticiones HTTP asociadas a las funcionalidades de autenticación y conexión a base de datos. En la Tabla \ref{tab:endpointsSprint01} se detalla cada uno de los endpoints desarrollados y la función que cumplen.
+En este sprint, se implementaron las peticiones HTTP asociadas a las funcionalidades de autenticación y conexión a base de datos. En las Tablas \ref{tab:endpointsAuth} y \ref{tab:endpointsConnections}  se detallan cada uno de los endpoints desarrollados y las funciones que cumplen.
 
-\input{../03Tables/02Chapter/C2.tableEndpointsSprint01}
+\input{../03Tables/02Chapter/C2.tableEndpointsAuth}
+\input{../03Tables/02Chapter/C2.tableEndpointsConnection.tex}
 
 \paragraph{Frontend:}
+Para complementar la construcción del servicio de autenticación se contruyeron las pantallas respectivas para el registro e inicio de sesión.  
 Aquí se construyeron las pantallas respectivas para registro y login. Se utilizó la librería Zod para validar los campos desde el lado del cliente asegurando que cumplan los formatos correctos previo a la integración con el backend. La gestión del estado de autenticación se maneja con Zustand, almacenando el token de acceso y la información del usuario de forma segura.
 
 \begin{lstlisting}
